@@ -1,7 +1,7 @@
 import structlog
 from fastapi import APIRouter, HTTPException, Depends, status
 
-from app.models.health_schema import (
+from app.models.health_check import (
     HealthCheck,
 )
 from app.api.dependencies import get_health_check

@@ -2,7 +2,7 @@ import time
 import structlog
 from datetime import datetime
 
-from app.models.health_schema import HealthCheck
+from app.models.health_check import HealthCheck
 from app.config import settings
 
 logger = structlog.get_logger()
