@@ -3,7 +3,7 @@ from unittest.mock import patch, AsyncMock
 from fastapi.testclient import TestClient
 
 from app.main import app
-from app.models.schemas import HealthStatus
+from app.models.health_schema import HealthStatus
 
 
 class TestHealthEndpoint:
@@ -17,7 +17,7 @@ class TestHealthEndpoint:
     def test_health_check_healthy(self, mock_get_health):
         """Test health check when all services are healthy"""
         # Mock a healthy response
-        from app.models.schemas import HealthCheck
+        from app.models.health_schema import HealthCheck
         from datetime import datetime
 
         mock_health = HealthCheck(
