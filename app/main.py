@@ -2,7 +2,8 @@ from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
 from contextlib import asynccontextmanager
 
-from app.api.routes import router
+from app.routers.BaseRouter import BaseRouter
+from app.routers.v1.WeatherRouter import WeatherRouter
 from app.config import settings
 
 
@@ -36,7 +37,8 @@ app.add_middleware(
 )
 
 # Include routes
-app.include_router(router, prefix="/api/v1")
+app.include_router(WeatherRouter, prefix="/api", tags=["api"])
+app.include_router(BaseRouter, prefix="/api", tags=["api"])
 
 if __name__ == "__main__":
     import uvicorn

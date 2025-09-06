@@ -1,5 +1,6 @@
 from pydantic import BaseModel
 from datetime import datetime
+from typing import Optional
 from enum import Enum
 
 
@@ -13,5 +14,5 @@ class HealthCheck(BaseModel):
     status: HealthStatus
     timestamp: datetime
     version: str
-    uptime_seconds: float
+    uptime_seconds: Optional[float] = 0.0
     # checks: List[ServiceCheck] = []
