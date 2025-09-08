@@ -98,7 +98,7 @@ resource "aws_cloudwatch_log_group" "lambda_logs" {
 
 # API Gateway v2 (HTTP API - cheaper than REST API)
 resource "aws_apigatewayv2_api" "api" {
-  name          = "${var.app_name}-api"
+  name          = "${var.app_name}-gateway"
   protocol_type = "HTTP"
   description   = "HTTP API for ${var.app_name}"
 
@@ -136,7 +136,7 @@ resource "aws_apigatewayv2_route" "app_root" {
 # API Gateway deployment
 resource "aws_apigatewayv2_stage" "api" {
   api_id      = aws_apigatewayv2_api.api.id
-  name        = "prod"
+  name        = var.environment
   auto_deploy = true
 
   access_log_settings {
@@ -153,6 +153,42 @@ resource "aws_apigatewayv2_stage" "api" {
     })
   }
 }
+
+resource "aws_api_gateway_api_key" "api" {
+  name        = "${var.envirionment}-api-key"
+  description = "API key for the ${var.envirionment} env"
+  enabled     = true
+}
+
+resource "aws_api_gateway_usage_plan" "api" {
+    name      = "${var.envirionment}-api-usage-plan"
+  description = "Basic API usage plan for the ${var.envirionment} env"
+
+  # Link the usage plan to your API and stage
+  api_stages {
+    api_id = aws_apigatewayv2_api.api.id
+    stage  = aws_apigatewayv2_stage.api.name
+  }
+
+  # Throttling limits (optional, but good practice)
+  throttle {
+    burst_limit = 100
+    rate_limit  = 50
+  }
+
+  # Quota limits (optional)
+  quota {
+    limit  = 1000
+    period = "DAY"
+  }
+}
+
+resource "aws_api_gateway_usage_plan_key" "api" {
+  key_id        = aws_api_gateway_api_key.api.id
+  key_type      = "API_KEY"
+  usage_plan_id = aws_api_gateway_usage_plan.api.id
+}
+
 
 # CloudWatch Log Group for API Gateway
 resource "aws_cloudwatch_log_group" "api_gateway_logs" {
