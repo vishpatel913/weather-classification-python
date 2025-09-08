@@ -1,4 +1,4 @@
-name: Plan and Deploy Infrastructure
+name: Infrastructure - Plan and Deploy
 
 on:
   workflow_dispatch:
