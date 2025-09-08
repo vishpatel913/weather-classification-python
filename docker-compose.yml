@@ -6,7 +6,7 @@ services:
   weather-service:
     build:
       context: .
-      dockerfile: Dockerfile
+      dockerfile: app/Dockerfile
 
     # Container name for easier reference
     container_name: weather-classification-api

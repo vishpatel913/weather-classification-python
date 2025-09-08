@@ -1,4 +1,5 @@
-FROM python:3.11-slim
+# FROM python:3.11-slim
+FROM public.ecr.aws/lambda/python:3.11
 
 ENV PYTHONDONTWRITEBYTECODE=1 \
     PYTHONUNBUFFERED=1 \
@@ -24,8 +25,8 @@ RUN pip install --no-cache-dir --upgrade pip && \
     pip install --no-cache-dir -r requirements.txt
 
 # Copy application code
-COPY app/ ./app/
-COPY .env .env
+COPY app/ ${LAMBDA_TASK_ROOT}/app/
+COPY .env.docker ${LAMBDA_TASK_ROOT}/.env
 
 # Change ownership of files to non-root user
 RUN chown -R appuser:appuser /app
@@ -34,10 +35,8 @@ RUN chown -R appuser:appuser /app
 USER appuser
 
 # Expose port
-EXPOSE 8080
+# EXPOSE 8080
 
-# Health check
-HEALTHCHECK --interval=30s --timeout=10s --start-period=5s --retries=3 \
-    CMD curl -f http://localhost:8080/api/health || exit 1
 
-CMD ["uvicorn", "app.main:app", "--host", "0.0.0.0", "--port", "8080"]
+# CMD ["uvicorn", "app.main:app", "--host", "0.0.0.0", "--port", "8080"]
+CMD ["lambda_handler.lambda_handler"]
