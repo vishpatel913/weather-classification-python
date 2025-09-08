@@ -19,16 +19,16 @@ provider "aws" {
   region = var.aws_region
 }
 
-resource "aws_s3_bucket" "terraform_statefile_store" {
-  bucket = "weather-terraform-state-files"
+# resource "aws_s3_bucket" "terraform_statefile_store" {
+#   bucket = "weather-terraform-state-files"
 
-  lifecycle {
-    prevent_destroy = true
-  }
-  versioning {
-    enabled = true
-  }
-}
+#   lifecycle {
+#     prevent_destroy = true
+#   }
+#   versioning {
+#     enabled = true
+#   }
+# }
 
 # ECR Repository
 resource "aws_ecr_repository" "api" {
