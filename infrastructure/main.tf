@@ -98,7 +98,7 @@ resource "aws_cloudwatch_log_group" "lambda_logs" {
 
 # API Gateway v2 (HTTP API - cheaper than REST API)
 resource "aws_apigatewayv2_api" "api" {
-  name          = "${var.app_name}-api"
+  name          = "${var.app_name}-gateway"
   protocol_type = "HTTP"
   description   = "HTTP API for ${var.app_name}"
 
@@ -133,10 +133,11 @@ resource "aws_apigatewayv2_route" "app_root" {
   target    = "integrations/${aws_apigatewayv2_integration.api.id}"
 }
 
+
 # API Gateway deployment
 resource "aws_apigatewayv2_stage" "api" {
   api_id      = aws_apigatewayv2_api.api.id
-  name        = "prod"
+  name        = var.environment
   auto_deploy = true
 
   access_log_settings {
