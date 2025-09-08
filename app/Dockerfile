@@ -26,7 +26,7 @@ RUN pip install --no-cache-dir --upgrade pip && \
 
 # Copy application code
 COPY app/ ${LAMBDA_TASK_ROOT}/app/
-COPY .env.docker ${LAMBDA_TASK_ROOT}/.env
+# COPY .env.docker ${LAMBDA_TASK_ROOT}/.env
 
 # Change ownership of files to non-root user
 RUN chown -R appuser:appuser /app

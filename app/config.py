@@ -5,7 +5,7 @@ from typing import Literal
 
 class Settings(BaseSettings):
     # Application settings
-    app_name: str = Field(default="Weather Clothing Service")
+    app_name: str = Field(default="Weather Classification Service")
     app_version: str = Field(default="0.1.0")
     debug: bool = Field(default=False)
     host: str = Field(default="0.0.0.0")
