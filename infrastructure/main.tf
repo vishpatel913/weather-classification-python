@@ -21,6 +21,7 @@ provider "aws" {
 
 resource "aws_s3_bucket" "terraform_statefile_store" {
   bucket = "terraform-state-files"
+  region = "eu-west-2"
 
   lifecycle {
     prevent_destroy = false # make true to prevent accidentally deleting state file
