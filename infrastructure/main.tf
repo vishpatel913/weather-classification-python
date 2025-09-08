@@ -11,7 +11,7 @@ terraform {
     encrypt = true
     region  = "eu-west-2"
     bucket  = "terraform-state-files"
-    key     = "terraform/all-state/terraform.tfstate"
+    key     = "terraform/state/terraform.tfstate"
   }
 }
 
@@ -19,24 +19,23 @@ provider "aws" {
   region = var.aws_region
 }
 
-resource "aws_s3_bucket" "terraform_statefile_store" {
-  bucket = "terraform-state-files"
-  region = "eu-west-2"
+# resource "aws_s3_bucket" "terraform_statefile_store" {
+#   bucket = "terraform-state-files"
 
-  lifecycle {
-    prevent_destroy = false # make true to prevent accidentally deleting state file
-  }
-  versioning {
-    enabled = true
-  }
-  server_side_encryption_configuration {
-    rule {
-      apply_server_side_encryption_by_default {
-        sse_algorithm = "AES256"
-      }
-    }
-  }
-}
+#   lifecycle {
+#     prevent_destroy = false # make true to prevent accidentally deleting state file
+#   }
+#   versioning {
+#     enabled = true
+#   }
+#   server_side_encryption_configuration {
+#     rule {
+#       apply_server_side_encryption_by_default {
+#         sse_algorithm = "AES256"
+#       }
+#     }
+#   }
+# }
 
 # ECR Repository
 resource "aws_ecr_repository" "api" {
