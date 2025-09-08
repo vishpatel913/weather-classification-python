@@ -29,7 +29,7 @@ class TestHealthEndpoint:
 
         mock_get_health.return_value = mock_health
 
-        response = self.client.get("/api/health")
+        response = self.client.get("/prod/api/health")
 
         assert response.status_code == 200
         data = response.json()
@@ -53,7 +53,7 @@ class TestHealthEndpoint:
 
     #     mock_get_health.return_value = mock_health
 
-    #     response = self.client.get("/api/health")
+    #     response = self.client.get("/prod/api/health")
 
     #     # Should return 503 for unhealthy status
     #     assert response.status_code == 503
@@ -73,7 +73,7 @@ class TestHealthEndpoint:
 
     #     mock_get_health.return_value = mock_health
 
-    #     response = self.client.get("/api/health")
+    #     response = self.client.get("/prod/api/health")
 
     #     # Should return 200 for degraded (service still working)
     #     assert response.status_code == 200
@@ -81,7 +81,7 @@ class TestHealthEndpoint:
 
     def test_health_check_response_format(self):
         """Test that health check response has correct format"""
-        response = self.client.get("/api/health")
+        response = self.client.get("/prod/api/health")
 
         # Should be 200 or 503, but always return JSON
         assert response.status_code in [200, 503]
@@ -104,7 +104,7 @@ class TestHealthEndpointIntegration:
     def test_real_health_check(self):
         """Test health check with real dependencies (may be slow)"""
         with TestClient(app) as client:
-            response = client.get("/api/health")
+            response = client.get("/prod/api/health")
 
             # Should return some response (may be degraded if external APIs are down)
             assert response.status_code in [200, 503]

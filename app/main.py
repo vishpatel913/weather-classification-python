@@ -1,6 +1,7 @@
 from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
 from contextlib import asynccontextmanager
+import uvicorn
 
 from app.routers.BaseRouter import BaseRouter
 from app.routers.v1.WeatherRouter import WeatherRouter
@@ -24,7 +25,8 @@ app = FastAPI(
     title=settings.app_name,
     version=settings.app_version,
     description="Weather-based clothing recommendation service",
-    lifespan=lifespan
+    lifespan=lifespan,
+    root_path="/prod"  # Config API Gateway
 )
 
 # CORS middleware for frontend integration
@@ -37,14 +39,9 @@ app.add_middleware(
 )
 
 # Include routes
-app.include_router(WeatherRouter, prefix="/api", tags=["api"])
-app.include_router(BaseRouter, prefix="/api", tags=["api"])
+app.include_router(WeatherRouter)
+app.include_router(BaseRouter)
 
 if __name__ == "__main__":
-    import uvicorn
-    uvicorn.run(
-        "app.main:app",
-        host=settings.host,
-        port=settings.port,
-        reload=settings.debug
-    )
+    # For local testing
+    uvicorn.run(app, host="0.0.0.0", port=8000)
