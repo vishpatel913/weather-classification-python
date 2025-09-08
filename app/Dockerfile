@@ -25,11 +25,11 @@ RUN pip install --no-cache-dir --upgrade pip && \
     pip install --no-cache-dir -r requirements.txt
 
 # Copy application code
-COPY app/ ${LAMBDA_TASK_ROOT}/app/
+COPY . ${LAMBDA_TASK_ROOT}/app/
 # COPY .env.docker ${LAMBDA_TASK_ROOT}/.env
 
 # Change ownership of files to non-root user
-RUN chown -R appuser:appuser /app
+RUN chown -R appuser:appuser /${LAMBDA_TASK_ROOT}/app/
 
 # Switch to non-root user
 USER appuser
