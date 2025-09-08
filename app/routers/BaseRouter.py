@@ -18,7 +18,7 @@ async def hello_world():
 
     logger.info("Hello world requested")
 
-    return {"hello": "world"}
+    return {"Welcome": "Python FastAPI image running on Lambda"}
 
 
 @BaseRouter.get("/health", response_model=HealthCheck)

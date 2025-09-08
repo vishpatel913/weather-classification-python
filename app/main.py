@@ -40,10 +40,15 @@ app.add_middleware(
 )
 
 # Include routes
-app.include_router(WeatherRouter)
-app.include_router(BaseRouter)
+app.include_router(WeatherRouter, prefix="/api")
+app.include_router(BaseRouter, prefix="/api")
 
-handler = Mangum(app=app, lifespan="off")
+handler = Mangum(
+    app,
+    lifespan="off",
+    api_gateway_base_path='/prod'
+)
+
 
 if __name__ == "__main__":
     # For local testing
