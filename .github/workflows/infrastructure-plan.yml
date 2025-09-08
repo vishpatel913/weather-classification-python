@@ -6,6 +6,10 @@ on:
     branches: [ main ]
     paths:
       - 'infrastructure/**'
+  push:
+    branches: [ main ]
+    paths:
+      - 'infrastructure/**'
 
 permissions:
   id-token: write

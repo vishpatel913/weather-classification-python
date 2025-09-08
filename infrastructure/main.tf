@@ -1,7 +1,4 @@
 
-locals {
-  tf_state_aws_region = "eu-west-2"
-}
 terraform {
   required_providers {
     aws = {
@@ -12,7 +9,7 @@ terraform {
 
   backend "s3" {
     encrypt = true
-    region  = locals.tf_state_aws_region
+    region  = "eu-west-2"
     bucket  = "terraform-state-files"
     key     = "terraform/all-state/terraform.tfstate"
   }
