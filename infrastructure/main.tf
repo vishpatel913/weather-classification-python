@@ -155,14 +155,14 @@ resource "aws_apigatewayv2_stage" "api" {
 }
 
 resource "aws_api_gateway_api_key" "api" {
-  name        = "${var.envirionment}-api-key"
-  description = "API key for the ${var.envirionment} env"
+  name        = "${var.environment}-api-key"
+  description = "API key for the ${var.environment} env"
   enabled     = true
 }
 
 resource "aws_api_gateway_usage_plan" "api" {
-    name      = "${var.envirionment}-api-usage-plan"
-  description = "Basic API usage plan for the ${var.envirionment} env"
+    name      = "${var.environment}-api-usage-plan"
+  description = "Basic API usage plan for the ${var.environment} env"
 
   # Link the usage plan to your API and stage
   api_stages {
