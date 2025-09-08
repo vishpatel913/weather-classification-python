@@ -71,12 +71,12 @@ resource "aws_iam_role_policy_attachment" "lambda_basic" {
 resource "aws_lambda_function" "api" {
   function_name = var.app_name
   role          = aws_iam_role.lambda_role.arn
-  
-  package_type  = "Image"
-  image_uri     = "${aws_ecr_repository.api.repository_url}:latest"
-  
-  timeout       = 900  # 15 minutes max
-  memory_size   = 1024 # Start with 1GB, adjust as needed
+
+  package_type = "Image"
+  image_uri    = "${aws_ecr_repository.api.repository_url}:latest"
+
+  timeout     = 900  # 15 minutes max
+  memory_size = 1024 # Start with 1GB, adjust as needed
 
   environment {
     variables = {
@@ -107,7 +107,7 @@ resource "aws_apigatewayv2_api" "api" {
     allow_headers     = ["*"]
     allow_methods     = ["*"]
     allow_origins     = ["*"]
-    max_age          = 86400
+    max_age           = 86400
   }
 }
 
