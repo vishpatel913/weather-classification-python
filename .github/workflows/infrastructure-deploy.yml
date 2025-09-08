@@ -1,7 +1,7 @@
 name: Plan and Deploy Infrastructure
 
 on:
-  workflow_call
+  workflow_dispatch
 
 env:
   AWS_REGION: us-east-1
