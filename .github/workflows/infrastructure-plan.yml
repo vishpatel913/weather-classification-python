@@ -41,4 +41,3 @@ jobs:
     - name: Terraform Plan
       working-directory: ./infrastructure
       run: terraform plan -no-color
-      continue-on-error: true
