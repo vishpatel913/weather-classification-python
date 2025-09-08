@@ -1,6 +1,7 @@
 from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
 from contextlib import asynccontextmanager
+from mangum import Mangum
 import uvicorn
 
 from app.routers.BaseRouter import BaseRouter
@@ -41,6 +42,8 @@ app.add_middleware(
 # Include routes
 app.include_router(WeatherRouter)
 app.include_router(BaseRouter)
+
+handler = Mangum(app=app, lifespan="off")
 
 if __name__ == "__main__":
     # For local testing
