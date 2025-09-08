@@ -154,41 +154,6 @@ resource "aws_apigatewayv2_stage" "api" {
   }
 }
 
-resource "aws_api_gateway_api_key" "api" {
-  name        = "${var.environment}-api-key"
-  description = "API key for the ${var.environment} env"
-  enabled     = true
-}
-
-resource "aws_api_gateway_usage_plan" "api" {
-    name      = "${var.environment}-api-usage-plan"
-  description = "Basic API usage plan for the ${var.environment} env"
-
-  # Link the usage plan to your API and stage
-  api_stages {
-    api_id = aws_apigatewayv2_api.api.id
-    stage  = aws_apigatewayv2_stage.api.name
-  }
-
-  # Throttling limits (optional, but good practice)
-  throttle {
-    burst_limit = 100
-    rate_limit  = 50
-  }
-
-  # Quota limits (optional)
-  quota {
-    limit  = 1000
-    period = "DAY"
-  }
-}
-
-resource "aws_api_gateway_usage_plan_key" "api" {
-  key_id        = aws_api_gateway_api_key.api.id
-  key_type      = "API_KEY"
-  usage_plan_id = aws_api_gateway_usage_plan.api.id
-}
-
 
 # CloudWatch Log Group for API Gateway
 resource "aws_cloudwatch_log_group" "api_gateway_logs" {
