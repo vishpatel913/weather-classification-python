@@ -4,7 +4,7 @@ from fastapi import FastAPI
 app = FastAPI()
 
 
-@app.get("/")
+@app.get("/prod")
 def read_root():
     return {"Welcome": "Welcome to the FastAPI on Lambda"}
 
