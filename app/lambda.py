@@ -7,7 +7,7 @@ app = FastAPI(
 
 
 @app.get('', include_in_schema=False)
-@app.get("/")
+@app.get("/health")
 def read_root():
     return {"Welcome": "Welcome to the FastAPI on Lambda"}
 
