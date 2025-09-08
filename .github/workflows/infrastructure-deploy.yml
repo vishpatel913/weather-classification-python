@@ -3,6 +3,10 @@ name: Plan and Deploy Infrastructure
 on:
   workflow_dispatch:
 
+permissions:
+  id-token: write
+  contents: read
+
 env:
   AWS_REGION: us-east-1
   TF_VERSION: 1.5.0
