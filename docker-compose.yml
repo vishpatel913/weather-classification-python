@@ -6,7 +6,7 @@ services:
   weather-service:
     build:
       context: .
-      dockerfile: Dockerfile
+      dockerfile: Dockerfile.local
 
     # Container name for easier reference
     container_name: weather-classification-api
@@ -25,10 +25,9 @@ services:
     # Volume mounts for development
     # Mounts local .env file into container so changes are reflected
     volumes:
-      - ./.env:/app/.env:ro # :ro means read-only
+      - ./.env:/app/.env:ro
 
     # Restart policy
-    # unless-stopped: restart unless explicitly stopped
     restart: unless-stopped
 
     # Health check configuration
