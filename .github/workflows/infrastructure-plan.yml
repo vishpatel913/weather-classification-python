@@ -40,10 +40,6 @@ jobs:
 
     - name: Terraform Init
       working-directory: ./infrastructure
-      run: rm -rf .terraform/
-
-    - name: Terraform Init
-      working-directory: ./infrastructure
       run: terraform init
 
     - name: Terraform Plan
