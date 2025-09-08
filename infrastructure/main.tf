@@ -133,6 +133,7 @@ resource "aws_apigatewayv2_route" "app_root" {
   target    = "integrations/${aws_apigatewayv2_integration.api.id}"
 }
 
+
 # API Gateway deployment
 resource "aws_apigatewayv2_stage" "api" {
   api_id      = aws_apigatewayv2_api.api.id
@@ -153,7 +154,6 @@ resource "aws_apigatewayv2_stage" "api" {
     })
   }
 }
-
 
 # CloudWatch Log Group for API Gateway
 resource "aws_cloudwatch_log_group" "api_gateway_logs" {
