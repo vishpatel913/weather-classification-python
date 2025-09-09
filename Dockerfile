@@ -1,5 +1,5 @@
 # FROM python:3.11-slim
-FROM public.ecr.aws/lambda/python:3.11
+FROM public.ecr.aws/lambda/python:3.13
 
 # ENV PYTHONDONTWRITEBYTECODE=1 \
 #     PYTHONUNBUFFERED=1 \
