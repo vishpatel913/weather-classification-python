@@ -24,8 +24,8 @@ class TestMetricTransformUtils:
         mock_unit_map = {"key1": "d.m", "key2": 'y'}
         result = transform_maps_to_metric(mock_value_map, mock_unit_map)
 
-        assert result == {"key1": {"units": "d.m", "value": 7.12},
-                          "key2": {"units": "y", "value": 1995}}
+        assert result == {"key1": {"unit": "d.m", "value": 7.12},
+                          "key2": {"unit": "y", "value": 1995}}
 
     def test_return_handle_empty_unit_values_success(self):
         """Test successful transform when unit fields are empty or missing"""
@@ -33,8 +33,8 @@ class TestMetricTransformUtils:
         mock_unit_map = {"key1": ""}
         result = transform_maps_to_metric(mock_value_map, mock_unit_map)
 
-        assert result == {"key1": {"units": "", "value": 7.12},
-                          "key2": {"units": "", "value": 1995}}
+        assert result == {"key1": {"unit": "", "value": 7.12},
+                          "key2": {"unit": "", "value": 1995}}
 
     def test_return_handle_incompatible_fields_success(self):
         """Test successful transform when fields are incompatible"""
@@ -43,5 +43,5 @@ class TestMetricTransformUtils:
 
         result = transform_maps_to_metric(mock_value_map, mock_unit_map)
 
-        assert result == {"key1": {"units": "", "value": 7.12},
-                          "key2": {"units": "", "value": 1995}}
+        assert result == {"key1": {"unit": "", "value": 7.12},
+                          "key2": {"unit": "", "value": 1995}}

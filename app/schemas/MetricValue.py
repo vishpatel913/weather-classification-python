@@ -1,11 +1,11 @@
 from pydantic import BaseModel, Field
-from typing import TypeVar
+from typing import Generic, TypeVar
 
 
 ValueType = TypeVar('ValueType', int, float, str)
 
 
-class MetricValue(BaseModel):
+class MetricValue(BaseModel, Generic[ValueType]):
     """
     A simple model to represent a value with its unit.
     """

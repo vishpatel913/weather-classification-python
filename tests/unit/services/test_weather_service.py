@@ -4,8 +4,9 @@ import httpx
 from datetime import datetime
 
 from app.services.WeatherService import WeatherService, WeatherServiceError
-from app.schemas.Weather import WeatherConditions
-# from app.schemas.WeatherData import WeatherForecastData
+from app.schemas.WeatherData import WeatherForecastData
+
+from ..weather_data_mocks import mock_current_weather_api_response
 
 
 class TestWeatherService:
@@ -22,55 +23,30 @@ class TestWeatherService:
             # Mock successful API response
             mock_response = AsyncMock()
             mock_response.status_code = 200
-            mock_response.json.return_value = {
-                "latitude": 51.5,
-                "longitude": -0.120000124,
-                "generationtime_ms": 0.108957290649414,
-                "utc_offset_seconds": 3600,
-                "timezone": "Europe/London",
-                "timezone_abbreviation": "GMT+1",
-                "elevation": 23,
-                "current_units": {
-                    "time": "iso8601",
-                    "interval": "seconds",
-                    "weather_code": "wmo code",
-                    "is_day": "",
-                    "temperature_2m": "°C",
-                    "apparent_temperature": "°C",
-                    "relative_humidity_2m": "%",
-                    "wind_speed_10m": "km/h",
-                    "precipitation": "mm",
-                    "precipitation_probability": "%",
-                    "cloud_cover": "%",
-                    "uv_index": "",
-                },
-                "current": {
-                    "time": "2023-09-09T09:00",
-                    "interval": 900,
-                    "weather_code": 1,
-                    "is_day": 1,
-                    "temperature_2m": 16.2,
-                    "apparent_temperature": 15.6,
-                    "relative_humidity_2m": 71,
-                    "wind_speed_10m": 6.5,
-                    "precipitation": 0.00,
-                    "precipitation_probability": 0,
-                    "cloud_cover": 15,
-                    "uv_index": 2.85,
-                },
-            }
+            mock_response.json.return_value = mock_current_weather_api_response
 
             mock_client.return_value.__aenter__.return_value.get.return_value = mock_response
 
             current_result = await self.weather_service.get_current_weather(51.5074, -0.1278)
 
-            assert isinstance(current_result, WeatherConditions)
-            assert current_result.temperature == 16.2
-            assert current_result.humidity == 71
-            assert current_result.wind_speed == 6.5
-            assert current_result.precipitation == 0.00
-            assert current_result.cloud_cover == 15
-            assert current_result.uv_index == 2.85
+            # expected_fields = ["temperature", "wind_speed"]
+            # assert all(key in current_result for key in expected_fields)
+            assert isinstance(current_result, WeatherForecastData)
+
+            assert current_result.weather_code == 2
+            assert current_result.is_day == 1
+            assert "2024-09-09T09:00" in current_result.time.isoformat()
+
+            assert current_result.temperature.value == 16.2
+            assert current_result.temperature.unit == "°C"
+            assert current_result.wind_speed.value == 6.5
+            assert current_result.wind_speed.unit == "km/h"
+            assert current_result.precipitation.value == 0.12
+            assert current_result.precipitation.unit == "mm"
+            assert current_result.cloud_cover.value == 15
+            assert current_result.cloud_cover.unit == "%"
+            assert current_result.uv_index.value == 2.85
+            assert current_result.uv_index.unit == ""
 
     @pytest.mark.asyncio
     async def test_get_current_weather_http_error(self):

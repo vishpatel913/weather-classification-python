@@ -7,6 +7,8 @@ class WeatherConditions(BaseModel):
     model_config = ConfigDict(
         json_schema_extra={
             "example": {
+                "time": "2025-09-09T13:30:00",
+                "weather_code": 3,
                 "temperature": 22.5,
                 "temperature_apparent": 23.0,
                 "humidity": 65.0,
@@ -15,7 +17,6 @@ class WeatherConditions(BaseModel):
                 "precipitation_probability": 15.0,
                 "cloud_cover": 40.0,
                 "uv_index": 5.2,
-                "weather_code": 3,
                 "is_day": True,
             }
         }

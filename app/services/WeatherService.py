@@ -2,7 +2,8 @@ from typing import Optional
 import httpx
 import structlog
 
-from app.schemas.Weather import WeatherConditions
+from app.schemas.WeatherData import WeatherForecastData
+from app.utils.metric_transformer import transform_maps_to_metric
 from app.config import settings
 
 logger = structlog.get_logger()
@@ -27,7 +28,7 @@ class WeatherService:
         self,
         latitude: float,
         longitude: float,
-    ) -> WeatherConditions:
+    ) -> WeatherForecastData:
         """Fetch current weather from Open-Meteo API"""
 
         params = {
@@ -50,14 +51,16 @@ class WeatherService:
                     f"{self.base_url}/forecast",
                     params=params
                 )
-                await response.raise_for_status()
-                data = await response.json()
+                response.raise_for_status()
+                data = response.json()
 
-                current = data["current"]
+                current = transform_maps_to_metric(
+                    data["current"], data["current_units"])
 
-                return WeatherConditions(
-                    time=current["time"],
-                    weather_code=current["weather_code"],
+                return WeatherForecastData(
+                    time=current["time"]["value"],
+                    weather_code=current["weather_code"]["value"],
+                    is_day=current["is_day"]["value"],
                     temperature=current["temperature_2m"],
                     temperature_apparent=current["apparent_temperature"],
                     humidity=current["relative_humidity_2m"],
@@ -66,7 +69,6 @@ class WeatherService:
                     precipitation_probability=current["precipitation_probability"],
                     cloud_cover=current["cloud_cover"],
                     uv_index=current["uv_index"],
-                    is_day=current["is_day"],
                 )
 
         except httpx.TimeoutException as e:

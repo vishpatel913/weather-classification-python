@@ -13,9 +13,9 @@ def transform_maps_to_metric(
     unit_map = unit_map or {}
 
     for key, value in value_map.items():
-        units = ""
+        unit = ""
         if key in unit_map:
-            units = unit_map[key] or ""
-        metric_map[key] = {"value": value, "units": units}
+            unit = unit_map[key] or ""
+        metric_map[key] = {"value": value, "unit": unit}
 
     return metric_map
