@@ -18,10 +18,9 @@ WeatherRouter = APIRouter(
 async def get_weather_params(
     latitude: Annotated[float, Query(..., ge=-90, le=90)],
     longitude: Annotated[float, Query(..., ge=-180, le=180)],
-    duration_hours: Annotated[int, Query(..., ge=1, le=24)] = 4
 
 ):
-    return WeatherRequestParams(latitude=latitude, longitude=longitude, duration_hours=duration_hours)
+    return WeatherRequestParams(latitude=latitude, longitude=longitude)
 
 
 @WeatherRouter.get("/current", response_model=WeatherConditions)
@@ -31,6 +30,6 @@ async def get_current(
 ):
     """Handler for getting current weather conditions"""
     logger.info("Requesting current weather...")
-    current = await weather_service.get_current_weather(latitude=query.latitude, longitude=query.longitude, duration=query.duration_hours)
+    current = await weather_service.get_current_weather(latitude=query.latitude, longitude=query.longitude, )
     logger.info("Requested current weather")
     return current

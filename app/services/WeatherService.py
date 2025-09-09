@@ -9,8 +9,8 @@ logger = structlog.get_logger()
 
 current_params = ["weather_code", "is_day", "temperature_2m", "apparent_temperature", "relative_humidity_2m", "wind_speed_10m",
                   "precipitation", "precipitation_probability", "cloud_cover", "uv_index", "visibility"]
-daily_params = ["weather_code", "sunrise", "sunset", "temperature_2m_max", "temperature_2m_min", "apparent_temperature_max",
-                "apparent_temperature_min", "precipitation_probability_max", "daylight_duration", "sunshine_duration", "uv_index_max"]
+daily_params = ["weather_code", "sunrise", "sunset", "sunshine_duration", "temperature_2m_max", "temperature_2m_min", "apparent_temperature_max",
+                "apparent_temperature_min", "precipitation_probability_max", "precipitation_hours", "cloud_cover_mean", "uv_index_max"]
 
 
 class WeatherServiceError(Exception):
@@ -27,7 +27,6 @@ class WeatherService:
         self,
         latitude: float,
         longitude: float,
-        duration: Optional[int] = 4
     ) -> WeatherConditions:
         """Fetch current weather from Open-Meteo API"""
 
@@ -51,7 +50,7 @@ class WeatherService:
                     f"{self.base_url}/forecast",
                     params=params
                 )
-                response.raise_for_status()
+                await response.raise_for_status()
                 data = response.json()
 
                 current = data["current"]

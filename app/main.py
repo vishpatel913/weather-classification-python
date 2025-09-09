@@ -2,7 +2,6 @@ from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
 from contextlib import asynccontextmanager
 from mangum import Mangum
-import uvicorn
 
 from app.routers.BaseRouter import BaseRouter
 from app.routers.v1.WeatherRouter import WeatherRouter
@@ -51,5 +50,11 @@ handler = Mangum(
 
 
 if __name__ == "__main__":
-    # For local testing
-    uvicorn.run(app, host="0.0.0.0", port=8000)
+    import uvicorn
+    uvicorn.run(
+        "app.main:app",
+        host="0.0.0.0",
+        port=8080,
+        reload=True,
+        log_level="info"
+    )
