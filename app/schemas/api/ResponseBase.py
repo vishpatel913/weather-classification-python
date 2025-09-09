@@ -4,7 +4,7 @@ from typing import Optional
 
 
 class ResponseBase(BaseModel):
-    request_id: Optional[str] = None
+    # request_id: Optional[str] = None
     timestamp: datetime = Field(default_factory=datetime.now)
 
 
