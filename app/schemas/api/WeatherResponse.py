@@ -9,14 +9,13 @@ from app.schemas.api.ResponseBase import ResponseBase
 class WeatherRequestParams(BaseModel):
     latitude: float = Field(..., ge=-90, le=90, description="Latitude")
     longitude: float = Field(..., ge=-180, le=180, description="Longitude")
-    duration_hours: Optional[int] = Field(
-        default=4, ge=1, le=24, description="Request timeline in hours")
+    # duration_hours: Optional[int] = Field(
+    #     default=4, ge=1, le=24, description="Request timeline in hours")
 
 
-class WeatherForecastResponse(ResponseBase):
-    latitude: float = Field(..., ge=-90, le=90, description="Latitude")
-    longitude: float = Field(..., ge=-180, le=180, description="Longitude")
+class WeatherForecastResponse(WeatherRequestParams):
     # last_updated: datetime = Field(default_factory=datetime.now)
+
     current: Optional[WeatherForecastData] = Field(...,
                                                    description="Current forecast for requested coords")
     hourly: Optional[list[WeatherForecastData]] = Field(...,
