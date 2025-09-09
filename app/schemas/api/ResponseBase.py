@@ -1,6 +1,6 @@
 from pydantic import BaseModel, Field
 from datetime import datetime
-from typing import Optional
+# from typing import Optional
 
 
 class ResponseBase(BaseModel):
