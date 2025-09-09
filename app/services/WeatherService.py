@@ -2,7 +2,7 @@ import httpx
 import structlog
 
 from app.schemas.WeatherData import WeatherForecastData
-from app.utils.metric_transformer import transform_maps_to_metric
+from app.utils.metric_transformers import transform_maps_to_metric
 from app.config import settings
 
 logger = structlog.get_logger()

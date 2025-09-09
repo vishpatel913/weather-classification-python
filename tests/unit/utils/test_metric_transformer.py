@@ -1,4 +1,4 @@
-from app.utils.metric_transformer import transform_maps_to_metric
+from app.utils.metric_transformers import transform_maps_to_metric
 
 
 class TestMetricTransformUtils:
@@ -20,28 +20,28 @@ class TestMetricTransformUtils:
 
     def test_return_valid_maps_success(self):
         """Test successful transform when inputs are valid"""
-        mock_value_map = {"key1": 7.12, "key2": 1995}
-        mock_unit_map = {"key1": "d.m", "key2": 'y'}
+        mock_value_map = {"key_1": 7.12, "key_2": 1995}
+        mock_unit_map = {"key_1": "d.m", "key_2": 'y'}
         result = transform_maps_to_metric(mock_value_map, mock_unit_map)
 
-        assert result == {"key1": {"unit": "d.m", "value": 7.12},
-                          "key2": {"unit": "y", "value": 1995}}
+        assert result == {"key_1": {"unit": "d.m", "value": 7.12},
+                          "key_2": {"unit": "y", "value": 1995}}
 
-    def test_return_handle_empty_unit_values_success(self):
+    def test_handle_empty_unit_values(self):
         """Test successful transform when unit fields are empty or missing"""
-        mock_value_map = {"key1": 7.12, "key2": 1995}
-        mock_unit_map = {"key1": ""}
+        mock_value_map = {"key_1": 7.12, "key_2": 1995}
+        mock_unit_map = {"key_1": ""}
         result = transform_maps_to_metric(mock_value_map, mock_unit_map)
 
-        assert result == {"key1": {"unit": "", "value": 7.12},
-                          "key2": {"unit": "", "value": 1995}}
+        assert result == {"key_1": {"unit": "", "value": 7.12},
+                          "key_2": {"unit": "", "value": 1995}}
 
-    def test_return_handle_incompatible_fields_success(self):
+    def test_handle_incompatible_fields(self):
         """Test successful transform when fields are incompatible"""
-        mock_value_map = {"key1": 7.12, "key2": 1995}
-        mock_unit_map = {"key3": "d.m", "key4": 'y'}
+        mock_value_map = {"key_1": 7.12, "key_2": 1995}
+        mock_unit_map = {"key_3": "d.m", "key_4": 'y'}
 
         result = transform_maps_to_metric(mock_value_map, mock_unit_map)
 
-        assert result == {"key1": {"unit": "", "value": 7.12},
-                          "key2": {"unit": "", "value": 1995}}
+        assert result == {"key_1": {"unit": "", "value": 7.12},
+                          "key_2": {"unit": "", "value": 1995}}
