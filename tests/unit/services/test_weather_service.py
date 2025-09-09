@@ -1,5 +1,5 @@
 import pytest
-from unittest.mock import AsyncMock, patch
+from unittest.mock import AsyncMock, Mock, patch
 import httpx
 from datetime import datetime
 
@@ -23,7 +23,9 @@ class TestWeatherService:
             # Mock successful API response
             mock_response = AsyncMock()
             mock_response.status_code = 200
-            mock_response.json.return_value = mock_current_weather_api_response
+            mock_response.json = Mock(
+                return_value=mock_current_weather_api_response)
+            mock_response.raise_for_status = Mock()
 
             mock_client.return_value.__aenter__.return_value.get.return_value = mock_response
 
@@ -55,9 +57,9 @@ class TestWeatherService:
             # Mock HTTP error
             mock_response = AsyncMock()
             mock_response.status_code = 404
-            mock_response.raise_for_status.side_effect = httpx.HTTPStatusError(
-                "Not found", request=AsyncMock(), response=mock_response
-            )
+            mock_response.raise_for_status = Mock(side_effect=httpx.HTTPStatusError(
+                "Not found", request=httpx.Request("GET", "http://test.com"), response=mock_response
+            ))
 
             mock_client.return_value.__aenter__.return_value.get.return_value = mock_response
 
@@ -86,12 +88,11 @@ class TestWeatherService:
             # Mock response with missing data
             mock_response = AsyncMock()
             mock_response.status_code = 200
-            mock_response.json.return_value = {
-                "current": {
-                    # "temperature_2m": 22.5
+            mock_response.json = Mock(
+                return_value={"current": {
+                    "temperature_2m": 22.5
                     # Missing other required fields
-                }
-            }
+                }})
 
             mock_client.return_value.__aenter__.return_value.get.return_value = mock_response
 
