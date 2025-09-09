@@ -2,7 +2,7 @@ from pydantic import BaseModel, Field
 from typing import Optional
 # from datetime import datetime
 
-from app.schemas.WeatherData import WeatherForecastData
+from app.schemas.WeatherData import WeatherForecastData, WeatherDailyForecastData
 from app.schemas.api.ResponseBase import ResponseBase
 
 
@@ -19,3 +19,9 @@ class WeatherForecastResponse(ResponseBase):
     # last_updated: datetime = Field(default_factory=datetime.now)
     current: Optional[WeatherForecastData] = Field(...,
                                                    description="Current forecast for requested coords")
+    hourly: Optional[list[WeatherForecastData]] = Field(...,
+                                                        description="Hourly forecast for requested coords")
+    today: Optional[WeatherDailyForecastData] = Field(...,
+                                                      description="Today's daily forecast for requested coords")
+    daily: Optional[list[WeatherDailyForecastData]] = Field(...,
+                                                            description="Daily forecast for requested coords")
