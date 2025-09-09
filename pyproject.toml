@@ -1,10 +1,9 @@
 [tool.poetry.group.dev.dependencies]
 pytest = "8.2.2"
 pylint = "3.3.8"
+
 [tool.pytest.ini_options]
-pythonpath = [
-  "./app"
-]
+pythonpath = ["./app"]
 
 [MASTER]
 init-hook='import sys; sys.path.append(".")'

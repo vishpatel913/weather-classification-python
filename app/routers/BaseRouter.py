@@ -1,5 +1,4 @@
 from fastapi import APIRouter
-import time
 import structlog
 from datetime import datetime
 

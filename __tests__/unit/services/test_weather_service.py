@@ -5,6 +5,7 @@ from datetime import datetime
 
 from app.services.WeatherService import WeatherService, WeatherServiceError
 from app.schemas.Weather import WeatherConditions
+# from app.schemas.WeatherData import WeatherForecastData
 
 
 class TestWeatherService:
@@ -35,41 +36,41 @@ class TestWeatherService:
                     "weather_code": "wmo code",
                     "is_day": "",
                     "temperature_2m": "°C",
-                    "relative_humidity_2m": "%",
                     "apparent_temperature": "°C",
+                    "relative_humidity_2m": "%",
                     "wind_speed_10m": "km/h",
                     "precipitation": "mm",
                     "precipitation_probability": "%",
                     "cloud_cover": "%",
-                    "uv_index": ""
+                    "uv_index": "",
                 },
                 "current": {
-                    "time": "2025-09-06T09:30",
+                    "time": "2023-09-09T09:00",
                     "interval": 900,
-                    "weather_code": 3,
+                    "weather_code": 1,
                     "is_day": 1,
-                    "temperature_2m": 22.5,
-                    "relative_humidity_2m": 65.0,
-                    "apparent_temperature": 16.3,
-                    "wind_speed_10m": 10.0,
-                    "precipitation": 0.0,
+                    "temperature_2m": 16.2,
+                    "apparent_temperature": 15.6,
+                    "relative_humidity_2m": 71,
+                    "wind_speed_10m": 6.5,
+                    "precipitation": 0.00,
                     "precipitation_probability": 0,
-                    "cloud_cover": 40.0,
-                    "uv_index": 5.0
-                }
+                    "cloud_cover": 15,
+                    "uv_index": 2.85,
+                },
             }
 
             mock_client.return_value.__aenter__.return_value.get.return_value = mock_response
 
-            weather = await self.weather_service.get_current_weather(51.5074, -0.1278)
+            current_result = await self.weather_service.get_current_weather(51.5074, -0.1278)
 
-            assert isinstance(weather, WeatherConditions)
-            assert weather.temperature == 22.5
-            assert weather.humidity == 65.0
-            assert weather.wind_speed == 10.0
-            assert weather.precipitation == 0.0
-            assert weather.cloud_cover == 40.0
-            assert weather.uv_index == 5.0
+            assert isinstance(current_result, WeatherConditions)
+            assert current_result.temperature == 16.2
+            assert current_result.humidity == 71
+            assert current_result.wind_speed == 6.5
+            assert current_result.precipitation == 0.00
+            assert current_result.cloud_cover == 15
+            assert current_result.uv_index == 2.85
 
     @pytest.mark.asyncio
     async def test_get_current_weather_http_error(self):

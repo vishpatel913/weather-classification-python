@@ -3,13 +3,6 @@ from typing import Optional
 from datetime import datetime
 
 
-class WeatherRequestParams(BaseModel):
-    latitude: float = Field(..., ge=-90, le=90, description="Latitude")
-    longitude: float = Field(..., ge=-180, le=180, description="Longitude")
-    duration_hours: Optional[int] = Field(
-        default=4, ge=1, le=24, description="Request timeline in hours")
-
-
 class WeatherConditions(BaseModel):
     model_config = ConfigDict(
         json_schema_extra={

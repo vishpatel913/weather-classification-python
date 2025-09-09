@@ -2,10 +2,8 @@ from fastapi import APIRouter, Depends, Query
 from typing import Annotated
 import structlog
 
-from app.schemas.Weather import (
-    WeatherRequestParams,
-    WeatherConditions,
-)
+from app.schemas.Weather import WeatherConditions
+from app.schemas.api.WeatherResponse import WeatherRequestParams
 from app.services.WeatherService import WeatherService
 
 logger = structlog.get_logger()
