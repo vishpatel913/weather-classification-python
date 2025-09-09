@@ -51,7 +51,7 @@ class WeatherService:
                     params=params
                 )
                 await response.raise_for_status()
-                data = response.json()
+                data = await response.json()
 
                 current = data["current"]
 
