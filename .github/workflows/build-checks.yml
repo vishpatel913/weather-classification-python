@@ -33,7 +33,4 @@ jobs:
           pylint $(git ls-files '*.py')
       - name: Test with pytest
         run: |
-          python -m pytest
-
-
-    
+          python -m pytest --load-plugins pylint_pydantic

@@ -1,5 +1,7 @@
+from datetime import datetime
 import pytest
 
+from app.schemas.metric_value import MetricValue
 from app.schemas.weather_data import WeatherForecastData, WeatherDailyForecastData
 from app.services.weather.exceptions import WeatherAPIFormatError
 from app.services.weather.mappers import map_current_weather, map_daily_weather

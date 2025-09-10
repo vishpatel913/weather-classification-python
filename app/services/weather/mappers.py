@@ -20,7 +20,7 @@ def map_current_weather(data: WeatherApiResponse) -> WeatherForecastData:
         current_data = data["current"]
         current_units = data["current_units"]
         current = transform_maps_to_metric(current_data, current_units)
-        return WeatherForecastData(
+        current_forecast = WeatherForecastData(
             time=current["time"]["value"],
             weather_code=current["weather_code"]["value"],
             is_day=current["is_day"]["value"],
@@ -33,6 +33,7 @@ def map_current_weather(data: WeatherApiResponse) -> WeatherForecastData:
             cloud_cover=current["cloud_cover"],
             uv_index=current["uv_index"],
         )
+        return current_forecast
 
     except KeyError as e:
         logger.error(

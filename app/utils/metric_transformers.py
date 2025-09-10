@@ -5,7 +5,7 @@ from app.schemas.metric_value import MetricValue, MetricRangeValue
 def transform_maps_to_metric(
     value_map: Dict[str, Union[str, int, float]] = None, unit_map: Dict[str, str] = None
 ) -> Dict[str, MetricValue]:
-    metric_map: dict(str, MetricValue) = {}
+    metric_map: dict[str, MetricValue] = {}
     value_map = value_map or {}
     unit_map = unit_map or {}
 
@@ -25,7 +25,7 @@ MIN_SUFFIX = "min"
 def transform_maps_to_metric_range(
     value_map: Dict[str, Union[str, int, float]] = None, unit_map: Dict[str, str] = None
 ) -> Dict[str, MetricRangeValue | MetricValue]:
-    metric_map: dict(str, MetricRangeValue | MetricValue) = {}
+    metric_map: dict[str, MetricRangeValue | MetricValue] = {}
     value_map = value_map or {}
     unit_map = unit_map or {}
 

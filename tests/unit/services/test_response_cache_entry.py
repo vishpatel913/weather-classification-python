@@ -1,7 +1,6 @@
 # TODO: make reusable and move to models
 """Unit tests for ResponseCacheEntry"""
 
-import pytest
 from datetime import datetime, timedelta
 
 from app.services.weather.models import ResponseCacheEntry
