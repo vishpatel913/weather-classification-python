@@ -1,9 +1,11 @@
-import pytest
 from unittest.mock import patch
+from datetime import datetime
 from fastapi.testclient import TestClient
 
+from app.schemas.health_check import HealthCheck
+from app.schemas.health_check import HealthStatus
+
 from app.main import app
-from app.schemas.HealthCheck import HealthStatus
 
 
 class TestHealthEndpoint:
@@ -16,9 +18,6 @@ class TestHealthEndpoint:
     @patch("app.routers.base_router.health_check")
     def test_health_check_healthy(self, mock_get_health):
         """Test health check when all services are healthy"""
-        # Mock a healthy response
-        from app.schemas.HealthCheck import HealthCheck
-        from datetime import datetime
 
         mock_health = HealthCheck(
             status=HealthStatus.HEALTHY,

@@ -1,5 +1,5 @@
-from pydantic import BaseModel, Field
 from typing import Generic, TypeVar, Optional
+from pydantic import BaseModel, Field
 
 
 ValueType = TypeVar("ValueType", int, float, str)

@@ -1,8 +1,8 @@
-from fastapi import APIRouter, Depends, Query
 from typing import Annotated
+from fastapi import APIRouter, Depends, Query
 import structlog
 
-from app.schemas.api.WeatherResponse import (
+from app.schemas.api.weather_response import (
     WeatherRequestParams,
     WeatherForecastResponse,
 )

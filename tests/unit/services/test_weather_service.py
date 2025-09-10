@@ -1,10 +1,9 @@
 """Integration tests for WeatherService"""
 
+from unittest.mock import patch
 import pytest
-from unittest.mock import patch, Mock
-from datetime import datetime
-from app.schemas.WeatherData import WeatherForecastData, WeatherDailyForecastData
 
+from app.schemas.weather_data import WeatherForecastData, WeatherDailyForecastData
 from app.services.weather.service import WeatherService
 
 

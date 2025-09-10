@@ -1,7 +1,7 @@
-from pydantic import BaseModel, Field
 from datetime import datetime
+from pydantic import BaseModel, Field
 
-from app.schemas.MetricValue import MetricValue, MetricRangeValue
+from app.schemas.metric_value import MetricValue, MetricRangeValue
 
 
 class WeatherForecastBase(BaseModel):

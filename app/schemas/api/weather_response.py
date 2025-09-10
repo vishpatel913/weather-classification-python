@@ -1,10 +1,10 @@
-from pydantic import BaseModel, Field
 from typing import Optional
+from pydantic import BaseModel, Field
 
 # from datetime import datetime
 
-from app.schemas.WeatherData import WeatherForecastData, WeatherDailyForecastData
-from app.schemas.api.ResponseBase import ResponseBase
+from app.schemas.weather_data import WeatherForecastData, WeatherDailyForecastData
+from app.schemas.api.response_base import ResponseBase
 
 
 class WeatherRequestParams(BaseModel):

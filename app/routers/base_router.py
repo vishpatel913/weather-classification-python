@@ -1,8 +1,8 @@
+from datetime import datetime
 from fastapi import APIRouter
 import structlog
-from datetime import datetime
 
-from app.schemas.HealthCheck import HealthCheck
+from app.schemas.health_check import HealthCheck
 from app.config import settings
 
 logger = structlog.get_logger()

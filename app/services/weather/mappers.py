@@ -2,7 +2,7 @@ from typing import List
 
 import structlog
 
-from app.schemas.WeatherData import WeatherDailyForecastData, WeatherForecastData
+from app.schemas.weather_data import WeatherDailyForecastData, WeatherForecastData
 from app.utils.metric_transformers import (
     transform_maps_to_metric,
     transform_maps_to_metric_range,

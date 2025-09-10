@@ -1,5 +1,5 @@
 from typing import Dict, Union
-from app.schemas.MetricValue import MetricValue, MetricRangeValue
+from app.schemas.metric_value import MetricValue, MetricRangeValue
 
 
 def transform_maps_to_metric(

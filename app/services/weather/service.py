@@ -1,11 +1,10 @@
 import structlog
 
-from app.schemas.WeatherData import WeatherForecastData, WeatherDailyForecastData
+from app.schemas.weather_data import WeatherForecastData, WeatherDailyForecastData
 from app.config import settings
 
 from .api_client import WeatherAPIClient
 from .cache import WeatherCache
-from .models import WeatherDataType
 from .mappers import map_current_weather, map_daily_weather
 
 logger = structlog.get_logger()

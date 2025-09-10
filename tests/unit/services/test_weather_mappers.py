@@ -1,9 +1,6 @@
 import pytest
-from unittest.mock import AsyncMock, Mock, patch
-import httpx
-from datetime import datetime
 
-from app.schemas.WeatherData import WeatherForecastData, WeatherDailyForecastData
+from app.schemas.weather_data import WeatherForecastData, WeatherDailyForecastData
 from app.services.weather.exceptions import WeatherAPIFormatError
 from app.services.weather.mappers import map_current_weather, map_daily_weather
 
@@ -68,6 +65,7 @@ class TestWeatherMappers:
 
         # testing today
         today_result = result[0]
+        assert isinstance(today_result, WeatherDailyForecastData)
 
         assert "2024-09-09" in today_result.time.isoformat()
         assert "2024-09-09T05:26" in today_result.sunrise.isoformat()
