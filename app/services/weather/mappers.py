@@ -2,10 +2,11 @@ from typing import List
 
 import structlog
 
-from app.services.weather.exceptions import WeatherAPIFormatError
 from app.schemas.WeatherData import WeatherDailyForecastData, WeatherForecastData
-from app.services.weather.models import WeatherApiResponse
 from app.utils.metric_transformers import transform_maps_to_metric, transform_maps_to_metric_range
+
+from .exceptions import WeatherAPIFormatError
+from .models import WeatherApiResponse
 
 logger = structlog.get_logger()
 

@@ -3,7 +3,7 @@ from typing import Annotated
 import structlog
 
 from app.schemas.api.WeatherResponse import WeatherRequestParams, WeatherForecastResponse
-from app.services.WeatherService import WeatherService
+from app.services.weather import WeatherService
 
 logger = structlog.get_logger()
 
@@ -20,15 +20,28 @@ async def get_weather_params(
     return WeatherRequestParams(latitude=latitude, longitude=longitude)
 
 
+def get_weather_service():
+    return WeatherService(cache_duration_minutes=10)
+
+
 @WeatherRouter.get("/current", response_model=WeatherForecastResponse)
 async def get_current(
     query: Annotated[WeatherRequestParams, Depends(get_weather_params)],
-    weather_service: WeatherService = Depends()
+    weather_service: WeatherService = Depends(get_weather_service)
 ):
     """Handler for getting current weather conditions"""
     logger.info("Requesting current weather...")
-    current = await weather_service.get_current_weather(latitude=query.latitude, longitude=query.longitude)
-    daily = await weather_service.get_daily_weather(latitude=query.latitude, longitude=query.longitude)
+    cache_keys = ["current", "daily"]
+    current = await weather_service.get_current_weather(
+        cache_keys=cache_keys,
+        latitude=query.latitude,
+        longitude=query.longitude
+    )
+    daily = await weather_service.get_daily_weather(
+        cache_keys=cache_keys,
+        latitude=query.latitude,
+        longitude=query.longitude
+    )
 
     logger.info("Requested current weather")
 

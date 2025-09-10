@@ -3,8 +3,8 @@ from fastapi.middleware.cors import CORSMiddleware
 from contextlib import asynccontextmanager
 from mangum import Mangum
 
-from app.routers.BaseRouter import BaseRouter
-from app.routers.v1.WeatherRouter import WeatherRouter
+from app.routers.base_router import BaseRouter
+from app.routers.v1.weather_router import WeatherRouter
 from app.config import settings
 
 

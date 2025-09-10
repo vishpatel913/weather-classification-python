@@ -49,9 +49,10 @@ class WeatherService:
         )
 
         # Check cache first
-        cached_data = self.cache.get(cache_keys, latitude, longitude)
-        if cached_data:
-            return cached_data
+        # TODO: move caching steps to api client
+        # cached_data = self.cache.get(cache_keys, latitude, longitude)
+        # if cached_data:
+        #     return cached_data
 
         # Fetch from API
         params = {
@@ -61,10 +62,10 @@ class WeatherService:
         }
 
         raw_data = await self.api_client.fetch_weather_data(params)
-        weather_data = map_current_weather(raw_data)
+        # Cache the raw result
+        # self.cache.set(cache_keys, raw_data, latitude, longitude)
 
-        # Cache the result
-        self.cache.set(cache_keys, weather_data, latitude, longitude)
+        weather_data = map_current_weather(raw_data)
 
         return weather_data
 
@@ -84,9 +85,9 @@ class WeatherService:
         )
 
         # Check cache first
-        cached_data = self.cache.get(cache_keys, latitude, longitude)
-        if cached_data:
-            return cached_data
+        # cached_data = self.cache.get(cache_keys, latitude, longitude)
+        # if cached_data:
+        #     return cached_data
 
         # Fetch from API
         params = {
@@ -96,17 +97,17 @@ class WeatherService:
         }
 
         raw_data = await self.api_client.fetch_weather_data(params)
-        weather_data = map_daily_weather(raw_data)
+        # Cache the raw result
+        # self.cache.set(cache_keys, raw_data, latitude, longitude)
 
-        # Cache the result
-        self.cache.set(cache_keys, weather_data, latitude, longitude)
+        weather_data = map_daily_weather(raw_data)
 
         return weather_data
 
-    def clear_cache(self) -> None:
-        """Clear all cached data"""
-        self.cache.clear()
+    # def clear_cache(self) -> None:
+    #     """Clear all cached data"""
+    #     self.cache.clear()
 
-    def get_cache_stats(self) -> Dict[str, Any]:
-        """Get cache statistics for monitoring"""
-        return self.cache.get_stats()
+    # def get_cache_stats(self) -> Dict[str, Any]:
+    #     """Get cache statistics for monitoring"""
+    #     return self.cache.get_stats()

@@ -4,7 +4,7 @@
 import pytest
 from datetime import datetime, timedelta
 
-from app.services.weather.models import ResponseCacheEntry, WeatherDataType
+from app.services.weather.models import ResponseCacheEntry
 
 
 class TestResponseCacheEntry:
