@@ -18,7 +18,7 @@ class TestResponseCacheEntry:
             timestamp=old_timestamp,
             latitude=51.5074,
             longitude=-0.1278,
-            cache_keys=["CURRENT"]
+            cache_keys=["CURRENT"],
         )
 
         assert entry.is_expired(cache_duration_minutes=30) is True
@@ -31,7 +31,7 @@ class TestResponseCacheEntry:
             timestamp=recent_timestamp,
             latitude=51.5074,
             longitude=-0.1278,
-            cache_keys=["CURRENT"]
+            cache_keys=["CURRENT"],
         )
 
         assert entry.is_expired(cache_duration_minutes=30) is False
@@ -43,7 +43,7 @@ class TestResponseCacheEntry:
             timestamp=datetime.now(),
             latitude=51.5074,
             longitude=-0.1278,
-            cache_keys=["CURRENT"]
+            cache_keys=["CURRENT"],
         )
 
         assert entry.matches_request(["CURRENT"], 51.5074, -0.1278) is True
@@ -55,13 +55,12 @@ class TestResponseCacheEntry:
             timestamp=datetime.now(),
             latitude=51.5074,
             longitude=-0.1278,
-            cache_keys=["CURRENT", "DAILY"]
+            cache_keys=["CURRENT", "DAILY"],
         )
 
         # Slightly different coordinates (within ~100m)
         # Different order of keys
-        assert entry.matches_request(
-            ["DAILY", "CURRENT"], 51.5075, -0.1279) is True
+        assert entry.matches_request(["DAILY", "CURRENT"], 51.5075, -0.1279) is True
 
     def test_matches_request_different_type(self):
         """Test request matching with different data type"""
@@ -70,7 +69,7 @@ class TestResponseCacheEntry:
             timestamp=datetime.now(),
             latitude=51.5074,
             longitude=-0.1278,
-            cache_keys=["CURRENT"]
+            cache_keys=["CURRENT"],
         )
 
         assert entry.matches_request(["DAILY"], 51.5074, -0.1278) is False

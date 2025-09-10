@@ -1,4 +1,3 @@
-from typing import Any, Dict
 import structlog
 
 from app.schemas.WeatherData import WeatherForecastData, WeatherDailyForecastData
@@ -6,31 +5,55 @@ from app.config import settings
 
 from .api_client import WeatherAPIClient
 from .cache import WeatherCache
-from .models import WeatherDataType, WeatherApiResponse
+from .models import WeatherDataType
 from .mappers import map_current_weather, map_daily_weather
 
 logger = structlog.get_logger()
 
 
 class WeatherService:
-    CURRENT_PARAMS = ["weather_code", "is_day", "temperature_2m", "apparent_temperature", "relative_humidity_2m",
-                      "wind_speed_10m", "precipitation", "precipitation_probability", "cloud_cover", "uv_index", "visibility"]
+    """API client for fetching current, daily, and hourly weather from Open-Meteo"""
 
-    DAILY_PARAMS = ["weather_code", "sunrise", "sunset", "sunshine_duration", "temperature_2m_max",
-                    "temperature_2m_min", "apparent_temperature_max", "apparent_temperature_min",
-                    "precipitation_probability_max", "precipitation_hours", "cloud_cover_mean", "uv_index_max"]
+    CURRENT_PARAMS = [
+        "weather_code",
+        "is_day",
+        "temperature_2m",
+        "apparent_temperature",
+        "relative_humidity_2m",
+        "wind_speed_10m",
+        "precipitation",
+        "precipitation_probability",
+        "cloud_cover",
+        "uv_index",
+        "visibility",
+    ]
+
+    DAILY_PARAMS = [
+        "weather_code",
+        "sunrise",
+        "sunset",
+        "sunshine_duration",
+        "temperature_2m_max",
+        "temperature_2m_min",
+        "apparent_temperature_max",
+        "apparent_temperature_min",
+        "precipitation_probability_max",
+        "precipitation_hours",
+        "cloud_cover_mean",
+        "uv_index_max",
+    ]
 
     DEFAULT_PARAMS = {
         "wind_speed_unit": "kmh",
         "timezone": "auto",
         "current": CURRENT_PARAMS,
-        "daily": DAILY_PARAMS
+        "daily": DAILY_PARAMS,
+        "forecast_days": 3,
     }
 
     def __init__(self, cache_duration_minutes: int = 30):
         self.api_client = WeatherAPIClient(
-            settings.weather_api_base_url,
-            settings.weather_api_timeout
+            settings.weather_api_base_url, settings.weather_api_timeout
         )
         self.cache = WeatherCache(cache_duration_minutes)
 
@@ -38,14 +61,11 @@ class WeatherService:
         self,
         latitude: float,
         longitude: float,
-        cache_keys: list[str] = [WeatherDataType.CURRENT]
     ) -> WeatherForecastData:
-        """Fetch current weather from Open-Meteo API"""
+        """Fetch current weather from API"""
 
         logger.info(
-            "Fetching current weather data",
-            latitude=latitude,
-            longitude=longitude
+            "Fetching current weather data", latitude=latitude, longitude=longitude
         )
 
         # Check cache first
@@ -58,7 +78,7 @@ class WeatherService:
         params = {
             "latitude": latitude,
             "longitude": longitude,
-            **self.DEFAULT_PARAMS
+            **self.DEFAULT_PARAMS,
         }
 
         raw_data = await self.api_client.fetch_weather_data(params)
@@ -74,14 +94,11 @@ class WeatherService:
         latitude: float,
         longitude: float,
         duration_days: int = 3,
-        cache_keys: list[str] = [WeatherDataType.DAILY]
     ) -> list[WeatherDailyForecastData]:
         """Fetch daily weather from Open-Meteo API"""
 
         logger.info(
-            "Fetching daily weather data",
-            latitude=latitude,
-            longitude=longitude
+            "Fetching daily weather data", latitude=latitude, longitude=longitude
         )
 
         # Check cache first
@@ -93,7 +110,8 @@ class WeatherService:
         params = {
             "latitude": latitude,
             "longitude": longitude,
-            **self.DEFAULT_PARAMS
+            "forecast_days": duration_days,
+            **self.DEFAULT_PARAMS,
         }
 
         raw_data = await self.api_client.fetch_weather_data(params)

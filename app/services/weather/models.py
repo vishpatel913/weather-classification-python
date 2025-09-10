@@ -1,4 +1,5 @@
 """Weather service data models and enums"""
+
 from dataclasses import dataclass
 from datetime import datetime, timedelta
 from enum import Enum
@@ -33,6 +34,7 @@ class WeatherApiResponse(TypedDict):
 @dataclass
 class ResponseCacheEntry:
     """Represents a cached weather data entry"""
+
     timestamp: datetime
     data: Any
 
@@ -42,8 +44,7 @@ class ResponseCacheEntry:
 
     def is_expired(self, cache_duration_minutes: int = 30) -> bool:
         """Check if cache entry is expired"""
-        expiry_time = self.timestamp + \
-            timedelta(minutes=cache_duration_minutes)
+        expiry_time = self.timestamp + timedelta(minutes=cache_duration_minutes)
         return datetime.now() > expiry_time
 
     def matches_request(self, cache_keys: list[str], lat: float, lon: float) -> bool:

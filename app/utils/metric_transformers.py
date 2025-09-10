@@ -1,12 +1,9 @@
-
-
 from typing import Dict, Union
 from app.schemas.MetricValue import MetricValue, MetricRangeValue
 
 
 def transform_maps_to_metric(
-    value_map: Dict[str, Union[str, int, float]] = None,
-    unit_map: Dict[str, str] = None
+    value_map: Dict[str, Union[str, int, float]] = None, unit_map: Dict[str, str] = None
 ) -> Dict[str, MetricValue]:
     metric_map: dict(str, MetricValue) = {}
     value_map = value_map or {}
@@ -26,8 +23,7 @@ MIN_SUFFIX = "min"
 
 
 def transform_maps_to_metric_range(
-    value_map: Dict[str, Union[str, int, float]] = None,
-    unit_map: Dict[str, str] = None
+    value_map: Dict[str, Union[str, int, float]] = None, unit_map: Dict[str, str] = None
 ) -> Dict[str, MetricRangeValue | MetricValue]:
     metric_map: dict(str, MetricRangeValue | MetricValue) = {}
     value_map = value_map or {}
@@ -44,6 +40,9 @@ def transform_maps_to_metric_range(
             key = key.removesuffix("_min")
             metric_map.setdefault(key, {"unit": unit}).update({"min": value})
         else:
-            metric_map[key] = {"unit": unit, "value": value, }
+            metric_map[key] = {
+                "unit": unit,
+                "value": value,
+            }
 
     return metric_map

@@ -29,9 +29,7 @@ async def health_check():
     logger.info("Health check requested", status=healthy_status)
 
     return HealthCheck(
-        status=healthy_status,
-        timestamp=datetime.now(),
-        version=settings.app_version
+        status=healthy_status, timestamp=datetime.now(), version=settings.app_version
     )
 
     # # Return appropriate HTTP status based on health

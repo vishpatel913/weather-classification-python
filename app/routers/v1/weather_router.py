@@ -2,20 +2,20 @@ from fastapi import APIRouter, Depends, Query
 from typing import Annotated
 import structlog
 
-from app.schemas.api.WeatherResponse import WeatherRequestParams, WeatherForecastResponse
+from app.schemas.api.WeatherResponse import (
+    WeatherRequestParams,
+    WeatherForecastResponse,
+)
 from app.services.weather import WeatherService
 
 logger = structlog.get_logger()
 
-WeatherRouter = APIRouter(
-    prefix="/v1/weather", tags=["weather"]
-)
+WeatherRouter = APIRouter(prefix="/v1/weather", tags=["weather"])
 
 
 async def get_weather_params(
     latitude: Annotated[float, Query(..., ge=-90, le=90)],
     longitude: Annotated[float, Query(..., ge=-180, le=180)],
-
 ):
     return WeatherRequestParams(latitude=latitude, longitude=longitude)
 
@@ -27,20 +27,15 @@ def get_weather_service():
 @WeatherRouter.get("/current", response_model=WeatherForecastResponse)
 async def get_current(
     query: Annotated[WeatherRequestParams, Depends(get_weather_params)],
-    weather_service: WeatherService = Depends(get_weather_service)
+    weather_service: WeatherService = Depends(get_weather_service),
 ):
     """Handler for getting current weather conditions"""
     logger.info("Requesting current weather...")
-    cache_keys = ["current", "daily"]
     current = await weather_service.get_current_weather(
-        cache_keys=cache_keys,
-        latitude=query.latitude,
-        longitude=query.longitude
+        latitude=query.latitude, longitude=query.longitude
     )
     daily = await weather_service.get_daily_weather(
-        cache_keys=cache_keys,
-        latitude=query.latitude,
-        longitude=query.longitude
+        latitude=query.latitude, longitude=query.longitude
     )
 
     logger.info("Requested current weather")
@@ -49,5 +44,5 @@ async def get_current(
         latitude=query.latitude,
         longitude=query.longitude,
         current=current,
-        today=daily[0]
+        today=daily[0],
     )

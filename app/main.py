@@ -26,7 +26,7 @@ app = FastAPI(
     version=settings.app_version,
     description="Weather-based clothing recommendation service",
     lifespan=lifespan,
-    root_path="/prod"  # Config API Gateway
+    root_path="/prod",  # Config API Gateway
 )
 
 # CORS middleware for frontend integration
@@ -42,19 +42,12 @@ app.add_middleware(
 app.include_router(WeatherRouter, prefix="/api")
 app.include_router(BaseRouter, prefix="/api")
 
-handler = Mangum(
-    app,
-    lifespan="off",
-    api_gateway_base_path='/prod'
-)
+handler = Mangum(app, lifespan="off", api_gateway_base_path="/prod")
 
 
 if __name__ == "__main__":
     import uvicorn
+
     uvicorn.run(
-        "app.main:app",
-        host="0.0.0.0",
-        port=8080,
-        reload=True,
-        log_level="info"
+        "app.main:app", host="0.0.0.0", port=8080, reload=True, log_level="info"
     )

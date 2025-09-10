@@ -58,7 +58,7 @@ mock_daily_weather_api_response = {
         "sunshine_duration": "s",
         "uv_index_max": "",
         "precipitation_probability_max": "%",
-        "precipitation_hours": "h"
+        "precipitation_hours": "h",
     },
     "daily": {
         "time": ["2024-09-09", "2024-09-10", "2024-09-11"],
@@ -72,8 +72,8 @@ mock_daily_weather_api_response = {
         "sunshine_duration": [39721.41, 8371.14, 39501.82],
         "uv_index_max": [4.95, 4.10, 4.85],
         "precipitation_probability_max": [3, 68, 73],
-        "precipitation_hours": [2.0, 10.0, 7.0]
-    }
+        "precipitation_hours": [2.0, 10.0, 7.0],
+    },
 }
 
 mock_hourly_weather_api_response = {
@@ -90,10 +90,16 @@ mock_hourly_weather_api_response = {
         "precipitation_probability": "%",
         "cloud_cover": "%",
         "uv_index": "",
-        "visibility": "m"
+        "visibility": "m",
     },
     "hourly": {
-        "time": ["2025-09-09T09:00", "2025-09-09T10:00", "2025-09-09T11:00", "2025-09-09T12:00", "2025-09-09T13:00"],
+        "time": [
+            "2025-09-09T09:00",
+            "2025-09-09T10:00",
+            "2025-09-09T11:00",
+            "2025-09-09T12:00",
+            "2025-09-09T13:00",
+        ],
         "weather_code": [1, 1, 2, 2, 80],
         "is_day": [1, 1, 1, 1, 1],
         "temperature_2m": [15.9, 17.2, 18.6, 19.1, 19.4],
@@ -104,5 +110,5 @@ mock_hourly_weather_api_response = {
         "precipitation_probability": [0, 0, 0, 30, 15],
         "cloud_cover": [15, 24, 65, 70, 100],
         "uv_index": [2.55, 3.65, 4.50, 4.95, 4.75],
-    }
+    },
 }

@@ -1,5 +1,6 @@
 from pydantic import BaseModel, Field
 from typing import Optional
+
 # from datetime import datetime
 
 from app.schemas.WeatherData import WeatherForecastData, WeatherDailyForecastData
@@ -16,11 +17,15 @@ class WeatherRequestParams(BaseModel):
 class WeatherForecastResponse(WeatherRequestParams, ResponseBase):
     # last_updated: datetime = Field(default_factory=datetime.now)
 
-    current: Optional[WeatherForecastData] = Field(None,
-                                                   description="Current forecast for requested coords")
-    today: Optional[WeatherDailyForecastData] = Field(None,
-                                                      description="Today's daily forecast for requested coords")
-    hourly: Optional[list[WeatherForecastData]] = Field(None,
-                                                        description="Hourly forecast for requested coords")
-    daily: Optional[list[WeatherDailyForecastData]] = Field(None,
-                                                            description="Daily forecast for requested coords")
+    current: Optional[WeatherForecastData] = Field(
+        None, description="Current forecast for requested coords"
+    )
+    today: Optional[WeatherDailyForecastData] = Field(
+        None, description="Today's daily forecast for requested coords"
+    )
+    hourly: Optional[list[WeatherForecastData]] = Field(
+        None, description="Hourly forecast for requested coords"
+    )
+    daily: Optional[list[WeatherDailyForecastData]] = Field(
+        None, description="Daily forecast for requested coords"
+    )

@@ -13,7 +13,7 @@ class TestHealthEndpoint:
         """Set up test client"""
         self.client = TestClient(app)
 
-    @patch('app.routers.BaseRouter.health_check')
+    @patch("app.routers.base_router.health_check")
     def test_health_check_healthy(self, mock_get_health):
         """Test health check when all services are healthy"""
         # Mock a healthy response
@@ -38,7 +38,7 @@ class TestHealthEndpoint:
         assert "version" in data
         assert "uptime_seconds" in data
 
-    # @patch('app.routers.BaseRouter.health_check')
+    # @patch('app.routers.base_router.health_check')
     # def test_health_check_unhealthy(self, mock_get_health):
     #     """Test health check when services are unhealthy"""
     #     from app.models.schemas import HealthCheck
@@ -58,7 +58,7 @@ class TestHealthEndpoint:
     #     # Should return 503 for unhealthy status
     #     assert response.status_code == 503
 
-    # @patch('app.routers.BaseRouter.health_check')
+    # @patch('app.routers.base_router.health_check')
     # def test_health_check_degraded(self, mock_get_health):
     #     """Test health check when services are degraded"""
     #     from app.models.schemas import HealthCheck
@@ -87,8 +87,7 @@ class TestHealthEndpoint:
         assert response.status_code in [200, 503]
 
         data = response.json()
-        required_fields = ["status", "timestamp",
-                           "version", "uptime_seconds"]
+        required_fields = ["status", "timestamp", "version", "uptime_seconds"]
 
         for field in required_fields:
             assert field in data

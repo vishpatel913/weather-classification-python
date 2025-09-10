@@ -45,11 +45,14 @@ class TestWeatherMappers:
 
     def test_map_current_weather_missing_current_fields(self):
         """Test current weather mapping with missing 'current' fields"""
-        invalid_response = {"current": {
-            "temperature_2m": 22.5,
-            "cloud_cover": 'invalid',
-            # Missing other required fields
-        }, "current_units": {}}
+        invalid_response = {
+            "current": {
+                "temperature_2m": 22.5,
+                "cloud_cover": "invalid",
+                # Missing other required fields
+            },
+            "current_units": {},
+        }
 
         with pytest.raises(WeatherAPIFormatError) as exc_info:
             map_current_weather(invalid_response)
@@ -90,11 +93,14 @@ class TestWeatherMappers:
 
     def test_map_daily_weather_missing_daily_fields(self):
         """Test daily weather mapping with missing 'daily' fields"""
-        invalid_response = {"daily": {
-            "temperature_2m_max": [22.5],
-            "cloud_cover_min": ['invalid'],
-            # Missing other required fields
-        }, "daily_units": {}}
+        invalid_response = {
+            "daily": {
+                "temperature_2m_max": [22.5],
+                "cloud_cover_min": ["invalid"],
+                # Missing other required fields
+            },
+            "daily_units": {},
+        }
 
         with pytest.raises(WeatherAPIFormatError) as exc_info:
             map_daily_weather(invalid_response)

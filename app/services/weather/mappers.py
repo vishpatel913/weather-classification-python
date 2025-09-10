@@ -3,7 +3,10 @@ from typing import List
 import structlog
 
 from app.schemas.WeatherData import WeatherDailyForecastData, WeatherForecastData
-from app.utils.metric_transformers import transform_maps_to_metric, transform_maps_to_metric_range
+from app.utils.metric_transformers import (
+    transform_maps_to_metric,
+    transform_maps_to_metric_range,
+)
 
 from .exceptions import WeatherAPIFormatError
 from .models import WeatherApiResponse
@@ -33,9 +36,9 @@ def map_current_weather(data: WeatherApiResponse) -> WeatherForecastData:
 
     except KeyError as e:
         logger.error(
-            "Missing required field in current weather api response", error=str(e))
-        raise WeatherAPIFormatError(
-            "Invalid current weather data format") from e
+            "Missing required field in current weather api response", error=str(e)
+        )
+        raise WeatherAPIFormatError("Invalid current weather data format") from e
 
 
 def map_daily_weather(data: WeatherApiResponse) -> List[WeatherDailyForecastData]:
@@ -52,11 +55,19 @@ def map_daily_weather(data: WeatherApiResponse) -> List[WeatherDailyForecastData
                 {
                     "temperature_2m_max": daily_data["temperature_2m_max"][i],
                     "temperature_2m_min": daily_data["temperature_2m_min"][i],
-                    "apparent_temperature_max": daily_data["apparent_temperature_max"][i],
-                    "apparent_temperature_min": daily_data["apparent_temperature_min"][i],
+                    "apparent_temperature_max": daily_data["apparent_temperature_max"][
+                        i
+                    ],
+                    "apparent_temperature_min": daily_data["apparent_temperature_min"][
+                        i
+                    ],
                     "uv_index_max": daily_data["uv_index_max"][i],
-                    "precipitation_probability_max": daily_data["precipitation_probability_max"][i],
-                }, daily_units)
+                    "precipitation_probability_max": daily_data[
+                        "precipitation_probability_max"
+                    ][i],
+                },
+                daily_units,
+            )
 
             daily_forecast = WeatherDailyForecastData(
                 time=daily_data["time"][i],
@@ -65,7 +76,6 @@ def map_daily_weather(data: WeatherApiResponse) -> List[WeatherDailyForecastData
                 sunset=daily_data["sunset"][i],
                 sunshine_duration=daily_data["sunshine_duration"][i],
                 precipitation_hours=daily_data["precipitation_hours"][i],
-
                 temperature=daily_range_data["temperature_2m"],
                 temperature_apparent=daily_range_data["apparent_temperature"],
                 precipitation_probability=daily_range_data["precipitation_probability"],
@@ -78,5 +88,6 @@ def map_daily_weather(data: WeatherApiResponse) -> List[WeatherDailyForecastData
 
     except KeyError as e:
         logger.error(
-            "Missing required field in daily weather api response", error=str(e))
+            "Missing required field in daily weather api response", error=str(e)
+        )
         raise WeatherAPIFormatError("Invalid daily weather data format") from e

@@ -16,13 +16,19 @@ class TestWeatherServiceIntegration:
         self.weather_service = WeatherService()
 
     @pytest.mark.asyncio
-    async def test_get_current_weather_full_flow(self, sample_coordinates, mock_current_weather_api_response):
+    async def test_get_current_weather_full_flow(
+        self, sample_coordinates, mock_current_weather_api_response
+    ):
         """Test complete current weather flow with caching"""
-        with patch.object(self.weather_service.api_client, 'fetch_weather_data') as mock_fetch:
+        with patch.object(
+            self.weather_service.api_client, "fetch_weather_data"
+        ) as mock_fetch:
             # Setup mocks
             mock_fetch.return_value = mock_current_weather_api_response
 
-            result = await self.weather_service.get_current_weather(**sample_coordinates)
+            result = await self.weather_service.get_current_weather(
+                **sample_coordinates
+            )
 
             # Verify API was only called once
             mock_fetch.assert_called_once()
@@ -39,9 +45,13 @@ class TestWeatherServiceIntegration:
             assert result.temperature.unit == "°C"
 
     @pytest.mark.asyncio
-    async def test_get_daily_weather_full_flow(self, sample_coordinates, mock_daily_weather_api_response):
+    async def test_get_daily_weather_full_flow(
+        self, sample_coordinates, mock_daily_weather_api_response
+    ):
         """Test complete current weather flow with caching"""
-        with patch.object(self.weather_service.api_client, 'fetch_weather_data') as mock_fetch:
+        with patch.object(
+            self.weather_service.api_client, "fetch_weather_data"
+        ) as mock_fetch:
             # Setup mocks
             mock_fetch.return_value = mock_daily_weather_api_response
 
