@@ -1,9 +1,9 @@
 """Integration tests for WeatherService"""
 
 import pytest
-from unittest.mock import patch, AsyncMock, Mock
-from datetime import datetime, timedelta
-from app.schemas.WeatherData import WeatherForecastData
+from unittest.mock import patch, Mock
+from datetime import datetime
+from app.schemas.WeatherData import WeatherForecastData, WeatherDailyForecastData
 
 from app.services.weather.service import WeatherService
 
@@ -23,17 +23,58 @@ class TestWeatherServiceIntegration:
             mock_fetch.return_value = mock_current_weather_api_response
 
             # First call should hit API
-            result1 = await self.weather_service.get_current_weather(**sample_coordinates)
+            result = await self.weather_service.get_current_weather(**sample_coordinates)
 
             # Second call should use cache
-            result2 = await self.weather_service.get_current_weather(**sample_coordinates)
+            refetch_result = await self.weather_service.get_current_weather(**sample_coordinates)
 
             # Verify API was only called once
             mock_fetch.assert_called_once()
 
             # Both results should be the same
-            assert result1 is result2
-            assert isinstance(result1, WeatherForecastData)
+            assert result is refetch_result
+            assert isinstance(result, WeatherForecastData)
+
+            # Mapped values should be as expected
+            assert result.weather_code == 2
+            assert result.is_day == 1
+            assert "2024-09-09T09:00" in result.time.isoformat()
+
+            assert result.temperature.value == 16.2
+            assert result.temperature.unit == "°C"
+
+    @pytest.mark.asyncio
+    async def test_get_daily_weather_full_flow(self, sample_coordinates, mock_daily_weather_api_response):
+        """Test complete current weather flow with caching"""
+        with patch.object(self.weather_service.api_client, 'fetch_weather_data') as mock_fetch:
+            # Setup mocks
+            mock_fetch.return_value = mock_daily_weather_api_response
+
+            # First call should hit API
+            result = await self.weather_service.get_daily_weather(**sample_coordinates)
+
+            # Second call should use cache
+            refetch_result = await self.weather_service.get_daily_weather(**sample_coordinates)
+
+            # Verify API was only called once
+            mock_fetch.assert_called_once()
+
+            # Both results should be the same
+            assert result is refetch_result
+            assert isinstance(result, list)
+            assert len(result) == 3
+            today_result = result[0]
+            assert isinstance(today_result, WeatherDailyForecastData)
+
+            # Mapped values should be as expected
+
+            assert today_result.weather_code == 80
+            assert "2024-09-09" in today_result.time.isoformat()
+            assert "2024-09-09T05:26" in today_result.sunrise.isoformat()
+
+            assert today_result.temperature.max == 20.0
+            assert today_result.temperature.min == 12.5
+            assert today_result.temperature.unit == "°C"
 
     @pytest.mark.asyncio
     async def test_cache_expiration(self, sample_coordinates, mock_current_weather_api_response):

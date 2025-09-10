@@ -20,6 +20,13 @@ class WeatherService:
                     "temperature_2m_min", "apparent_temperature_max", "apparent_temperature_min",
                     "precipitation_probability_max", "precipitation_hours", "cloud_cover_mean", "uv_index_max"]
 
+    DEFAULT_PARAMS = {
+        "wind_speed_unit": "kmh",
+        "timezone": "auto",
+        "current": CURRENT_PARAMS,
+        "daily": DAILY_PARAMS
+    }
+
     def __init__(self, cache_duration_minutes: int = 30):
         self.api_client = WeatherAPIClient(
             settings.weather_api_base_url,
@@ -50,9 +57,7 @@ class WeatherService:
         params = {
             "latitude": latitude,
             "longitude": longitude,
-            "current": self.CURRENT_PARAMS,
-            "wind_speed_unit": "kmh",
-            "timezone": "auto"
+            **self.DEFAULT_PARAMS
         }
 
         raw_data = await self.api_client.fetch_weather_data(params)
@@ -72,18 +77,31 @@ class WeatherService:
     ) -> list[WeatherDailyForecastData]:
         """Fetch daily weather from Open-Meteo API"""
 
-        # Check cache first
-        cached_data = self.cache.get(latitude, longitude, cache_keys)
-        if cached_data:
-            return cached_data
-
         logger.info(
             "Fetching daily weather data",
             latitude=latitude,
             longitude=longitude
         )
 
-        return []
+        # Check cache first
+        cached_data = self.cache.get(cache_keys, latitude, longitude)
+        if cached_data:
+            return cached_data
+
+        # Fetch from API
+        params = {
+            "latitude": latitude,
+            "longitude": longitude,
+            **self.DEFAULT_PARAMS
+        }
+
+        raw_data = await self.api_client.fetch_weather_data(params)
+        weather_data = map_daily_weather(raw_data)
+
+        # Cache the result
+        self.cache.set(cache_keys, weather_data, latitude, longitude)
+
+        return weather_data
 
     def clear_cache(self) -> None:
         """Clear all cached data"""
