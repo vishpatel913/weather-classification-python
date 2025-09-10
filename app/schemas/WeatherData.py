@@ -31,17 +31,17 @@ class WeatherForecastData(WeatherForecastBase):
 
 
 class WeatherDailyForecastData(WeatherForecastBase):
-    sunrise: datetime = Field(..., description="Time of sun rise"),
-    sunset: datetime = Field(..., description="Time of sun set"),
+    sunrise: datetime = Field(..., description="Time of sun rise")
+    sunset: datetime = Field(..., description="Time of sun set")
     sunshine_duration: float = Field(
-        ..., description="Amount of time the sun will be out"),
+        ..., description="Amount of time the sun will be out")
 
     temperature: MetricRangeValue[float] = Field(
-        ..., description="Temperature range in Celsius"),
+        ..., description="Temperature range in Celsius")
     temperature_apparent: MetricRangeValue[float] = Field(
-        ..., description="Apparent temperature range in Celsius"),
-    uv_index: MetricRangeValue[float] = Field(..., description="UV index"),
+        ..., description="Apparent temperature range in Celsius")
     precipitation_probability: MetricRangeValue[float] = Field(
-        ..., description="Precipitation probability range"),
+        ..., description="Precipitation probability range")
     precipitation_hours: float = Field(
         ..., description="Hours of precipitation in the day")
+    uv_index: MetricRangeValue[float] = Field(..., description="UV index")

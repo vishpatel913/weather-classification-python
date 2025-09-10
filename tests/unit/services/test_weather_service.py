@@ -4,9 +4,9 @@ import httpx
 from datetime import datetime
 
 from app.services.WeatherService import WeatherService, WeatherServiceError
-from app.schemas.WeatherData import WeatherForecastData
+from app.schemas.WeatherData import WeatherForecastData, WeatherDailyForecastData
 
-from ..weather_data_mocks import mock_current_weather_api_response
+from ..weather_data_mocks import mock_current_weather_api_response, mock_daily_weather_api_response
 
 
 class TestWeatherService:
@@ -18,7 +18,7 @@ class TestWeatherService:
 
     @pytest.mark.asyncio
     async def test_get_current_weather_success(self):
-        """Test successful weather data retrieval"""
+        """Test successful current weather data retrieval"""
         with patch('httpx.AsyncClient') as mock_client:
             # Mock successful API response
             mock_response = AsyncMock()
@@ -100,3 +100,32 @@ class TestWeatherService:
                 await self.weather_service.get_current_weather(51.5074, -0.1278)
 
             assert "Invalid weather data format" in str(exc_info.value)
+
+    @pytest.mark.asyncio
+    async def test_get_daily_weather_success(self):
+        """Test successful daily weather data retrieval"""
+        with patch('httpx.AsyncClient') as mock_client:
+            # Mock successful API response
+            mock_response = AsyncMock()
+            mock_response.status_code = 200
+            mock_response.json = Mock(
+                return_value=mock_daily_weather_api_response)
+            mock_response.raise_for_status = Mock()
+
+            mock_client.return_value.__aenter__.return_value.get.return_value = mock_response
+
+            daily_result = await self.weather_service.get_daily_weather(51.5074, -0.1278)
+
+            assert isinstance(daily_result, list)
+            assert len(daily_result) == 3
+
+            today_result = daily_result[0]
+            # assert isinstance(today_result, WeatherDailyForecastData)
+            assert "2024-09-09" in today_result.time.isoformat()
+            assert "2024-09-09T05:26" in today_result.sunrise.isoformat()
+            assert today_result.temperature.max == 20.0
+            assert today_result.temperature.min == 12.5
+            assert today_result.temperature.unit == "°C"
+            assert today_result.uv_index.max == 4.95
+            assert today_result.precipitation_probability.max == 3.0
+            assert today_result.precipitation_hours == 2.0

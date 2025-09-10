@@ -13,14 +13,14 @@ class WeatherRequestParams(BaseModel):
     #     default=4, ge=1, le=24, description="Request timeline in hours")
 
 
-class WeatherForecastResponse(WeatherRequestParams):
+class WeatherForecastResponse(WeatherRequestParams, ResponseBase):
     # last_updated: datetime = Field(default_factory=datetime.now)
 
-    current: Optional[WeatherForecastData] = Field(...,
+    current: Optional[WeatherForecastData] = Field(None,
                                                    description="Current forecast for requested coords")
-    hourly: Optional[list[WeatherForecastData]] = Field(...,
-                                                        description="Hourly forecast for requested coords")
-    today: Optional[WeatherDailyForecastData] = Field(...,
+    today: Optional[WeatherDailyForecastData] = Field(None,
                                                       description="Today's daily forecast for requested coords")
-    daily: Optional[list[WeatherDailyForecastData]] = Field(...,
+    hourly: Optional[list[WeatherForecastData]] = Field(None,
+                                                        description="Hourly forecast for requested coords")
+    daily: Optional[list[WeatherDailyForecastData]] = Field(None,
                                                             description="Daily forecast for requested coords")

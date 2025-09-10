@@ -17,7 +17,8 @@ class MetricRangeValue(BaseModel, Generic[ValueType]):
     """
     A min/max model to represent values with their unit.
     """
-    max: ValueType = Field(..., description="Maximum value of the metric")
-    min: Optional[ValueType] = Field(...,
+    max: Optional[ValueType] = Field(default=None,
+                                     description="Maximum value of the metric")
+    min: Optional[ValueType] = Field(default=None,
                                      description="Minimum value of the metric")
     unit: str = Field(..., description="Unit of the metric")
