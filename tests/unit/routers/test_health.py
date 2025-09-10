@@ -96,11 +96,9 @@ class TestHealthEndpoint:
         assert isinstance(data["uptime_seconds"], (int, float))
 
 
-@pytest.mark.integration
 class TestHealthEndpointIntegration:
     """Integration tests for health endpoint with real dependencies"""
 
-    @pytest.mark.slow
     def test_real_health_check(self):
         """Test health check with real dependencies (may be slow)"""
         with TestClient(app) as client:

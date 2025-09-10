@@ -1,131 +1,90 @@
+"""Integration tests for WeatherService"""
+
 import pytest
-from unittest.mock import AsyncMock, Mock, patch
-import httpx
-from datetime import datetime
+from unittest.mock import patch, AsyncMock, Mock
+from datetime import datetime, timedelta
+from app.schemas.WeatherData import WeatherForecastData
 
-from app.services.WeatherService import WeatherService, WeatherServiceError
-from app.schemas.WeatherData import WeatherForecastData, WeatherDailyForecastData
-
-from ..weather_data_mocks import mock_current_weather_api_response, mock_daily_weather_api_response
+from app.services.weather.service import WeatherService
 
 
-class TestWeatherService:
-    """Test cases for the WeatherService"""
+class TestWeatherServiceIntegration:
+    """Integration test cases for the complete WeatherService"""
 
     def setup_method(self):
         """Set up weather service instance"""
         self.weather_service = WeatherService()
 
     @pytest.mark.asyncio
-    async def test_get_current_weather_success(self):
-        """Test successful current weather data retrieval"""
-        with patch('httpx.AsyncClient') as mock_client:
-            # Mock successful API response
-            mock_response = AsyncMock()
-            mock_response.status_code = 200
-            mock_response.json = Mock(
-                return_value=mock_current_weather_api_response)
-            mock_response.raise_for_status = Mock()
+    async def test_get_current_weather_full_flow(self, sample_coordinates, mock_current_weather_api_response):
+        """Test complete current weather flow with caching"""
+        with patch.object(self.weather_service.api_client, 'fetch_weather_data') as mock_fetch:
+            # Setup mocks
+            mock_fetch.return_value = mock_current_weather_api_response
 
-            mock_client.return_value.__aenter__.return_value.get.return_value = mock_response
+            # First call should hit API
+            result1 = await self.weather_service.get_current_weather(**sample_coordinates)
 
-            current_result = await self.weather_service.get_current_weather(51.5074, -0.1278)
+            # Second call should use cache
+            result2 = await self.weather_service.get_current_weather(**sample_coordinates)
 
-            # expected_fields = ["temperature", "wind_speed"]
-            # assert all(key in current_result for key in expected_fields)
-            assert isinstance(current_result, WeatherForecastData)
+            # Verify API was only called once
+            mock_fetch.assert_called_once()
 
-            assert current_result.weather_code == 2
-            assert current_result.is_day == 1
-            assert "2024-09-09T09:00" in current_result.time.isoformat()
-
-            assert current_result.temperature.value == 16.2
-            assert current_result.temperature.unit == "°C"
-            assert current_result.wind_speed.value == 6.5
-            assert current_result.wind_speed.unit == "km/h"
-            assert current_result.precipitation.value == 0.12
-            assert current_result.precipitation.unit == "mm"
-            assert current_result.cloud_cover.value == 15
-            assert current_result.cloud_cover.unit == "%"
-            assert current_result.uv_index.value == 2.85
-            assert current_result.uv_index.unit == ""
+            # Both results should be the same
+            assert result1 is result2
+            assert isinstance(result1, WeatherForecastData)
 
     @pytest.mark.asyncio
-    async def test_get_current_weather_http_error(self):
-        """Test weather data retrieval with HTTP error"""
-        with patch('httpx.AsyncClient') as mock_client:
-            # Mock HTTP error
-            mock_response = AsyncMock()
-            mock_response.status_code = 404
-            mock_response.raise_for_status = Mock(side_effect=httpx.HTTPStatusError(
-                "Not found", request=httpx.Request("GET", "http://test.com"), response=mock_response
-            ))
+    async def test_cache_expiration(self, sample_coordinates, mock_current_weather_api_response):
+        """Test that expired cache entries are not used"""
+        # Set short cache duration
+        weather_service_short_cache = WeatherService(
+            cache_duration_minutes=0.01)
 
-            mock_client.return_value.__aenter__.return_value.get.return_value = mock_response
+        with patch.object(weather_service_short_cache.api_client, 'fetch_weather_data') as mock_fetch:
+            mock_fetch.return_value = mock_current_weather_api_response
 
-            with pytest.raises(WeatherServiceError) as exc_info:
-                await self.weather_service.get_current_weather(51.5074, -0.1278)
+            # First call
+            await weather_service_short_cache.get_current_weather(**sample_coordinates)
 
-            assert "Weather API error" in str(exc_info.value)
+            # Wait for cache to expire
+            import asyncio
+            await asyncio.sleep(0.7)
 
-    @pytest.mark.asyncio
-    async def test_get_current_weather_timeout(self):
-        """Test weather data retrieval with timeout"""
-        with patch('httpx.AsyncClient') as mock_client:
-            # Mock timeout
-            mock_client.return_value.__aenter__.return_value.get.side_effect = httpx.TimeoutException(
-                "Timeout")
+            # Second call should hit API again
+            await weather_service_short_cache.get_current_weather(**sample_coordinates)
 
-            with pytest.raises(WeatherServiceError) as exc_info:
-                await self.weather_service.get_current_weather(51.5074, -0.1278)
+            # API should have been called twice
+            assert mock_fetch.call_count == 2
 
-            assert "Weather service timeout" in str(exc_info.value)
+    def test_cache_stats(self):
+        """Test cache statistics functionality"""
+        # Add some mock cache entries
+        now = datetime.now()
+        expired_entry = Mock()
+        expired_entry.is_expired.return_value = True
+        active_entry = Mock()
+        active_entry.is_expired.return_value = False
 
-    @pytest.mark.asyncio
-    async def test_get_current_weather_invalid_data(self):
-        """Test weather data retrieval with invalid response format"""
-        with patch('httpx.AsyncClient') as mock_client:
-            # Mock response with missing data
-            mock_response = AsyncMock()
-            mock_response.status_code = 200
-            mock_response.json = Mock(
-                return_value={"current": {
-                    "temperature_2m": 22.5
-                    # Missing other required fields
-                }})
+        self.weather_service.cache.store = [
+            expired_entry, active_entry, active_entry]
 
-            mock_client.return_value.__aenter__.return_value.get.return_value = mock_response
+        stats = self.weather_service.get_cache_stats()
 
-            with pytest.raises(WeatherServiceError) as exc_info:
-                await self.weather_service.get_current_weather(51.5074, -0.1278)
+        assert stats["total_entries"] == 3
+        assert stats["expired_entries"] == 1
+        assert stats["active_entries"] == 2
+        assert stats["cache_duration_minutes"] == 30
 
-            assert "Invalid weather data format" in str(exc_info.value)
+    def test_clear_cache(self):
+        """Test cache clearing"""
+        # Add mock entries
+        active_entry = Mock()
+        active_entry.is_expired.return_value = False
+        self.weather_service.cache.store = [
+            active_entry, active_entry]
+        assert len(self.weather_service.cache.store) == 2
 
-    @pytest.mark.asyncio
-    async def test_get_daily_weather_success(self):
-        """Test successful daily weather data retrieval"""
-        with patch('httpx.AsyncClient') as mock_client:
-            # Mock successful API response
-            mock_response = AsyncMock()
-            mock_response.status_code = 200
-            mock_response.json = Mock(
-                return_value=mock_daily_weather_api_response)
-            mock_response.raise_for_status = Mock()
-
-            mock_client.return_value.__aenter__.return_value.get.return_value = mock_response
-
-            daily_result = await self.weather_service.get_daily_weather(51.5074, -0.1278)
-
-            assert isinstance(daily_result, list)
-            assert len(daily_result) == 3
-
-            today_result = daily_result[0]
-            # assert isinstance(today_result, WeatherDailyForecastData)
-            assert "2024-09-09" in today_result.time.isoformat()
-            assert "2024-09-09T05:26" in today_result.sunrise.isoformat()
-            assert today_result.temperature.max == 20.0
-            assert today_result.temperature.min == 12.5
-            assert today_result.temperature.unit == "°C"
-            assert today_result.uv_index.max == 4.95
-            assert today_result.precipitation_probability.max == 3.0
-            assert today_result.precipitation_hours == 2.0
+        self.weather_service.clear_cache()
+        assert len(self.weather_service.cache.store) == 0

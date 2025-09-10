@@ -13,25 +13,26 @@ class WeatherCache:
     """Manages weather data caching"""
 
     def __init__(self, cache_duration_minutes: int = 30):
-        self.cache: List[ResponseCacheEntry] = []
+        self.store: List[ResponseCacheEntry] = []
         self.cache_duration_minutes = cache_duration_minutes
 
-    def get(self, cache_key: str, latitude: float, longitude: float) -> Optional[Any]:
+    def get(self, cache_keys: list[str], latitude: float, longitude: float) -> Optional[Any]:
         """Retrieve data from cache if available and not expired"""
-        for entry in self.cache:
-            if (entry.matches_request(cache_key, latitude, longitude)
+        for entry in self.store:
+            if (entry.matches_request(cache_keys, latitude, longitude)
                     and not entry.is_expired(self.cache_duration_minutes)):
-                logger.info("Cache hit", cache_key=cache_key.value)
+                logger.info("Cache hit", cache_keys=''.join(str(x)
+                            for x in cache_keys))
                 return entry.data
         return None
 
-    def set(self, cache_key: str, data: Any, latitude: float, longitude: float) -> None:
+    def set(self, cache_keys: list[str], data: Any, latitude: float, longitude: float) -> None:
         """Add data to cache"""
         # Remove expired entries and entries for same location/type
-        self.cache = [
-            entry for entry in self.cache
+        self.store = [
+            entry for entry in self.store
             if not (entry.is_expired(self.cache_duration_minutes) or
-                    entry.matches_request(cache_key, latitude, longitude))
+                    entry.matches_request(cache_keys, latitude, longitude))
         ]
 
         # Add new entry
@@ -40,21 +41,21 @@ class WeatherCache:
             timestamp=datetime.now(),
             latitude=latitude,
             longitude=longitude,
-            cache_key=cache_key,
+            cache_keys=cache_keys,
         )
-        self.cache.append(entry)
-        logger.info("Data cached", cache_key=cache_key.value,
-                    cache_size=len(self.cache))
+        self.store.append(entry)
+        logger.info("Data cached", cache_keys=''.join(str(x) for x in cache_keys),
+                    cache_size=len(self.store))
 
     def clear(self) -> None:
         """Clear all cached data"""
-        self.cache.clear()
+        self.store.clear()
         logger.info("Cache cleared")
 
     def get_stats(self) -> Dict[str, Any]:
         """Get cache statistics for monitoring"""
-        total_entries = len(self.cache)
-        expired_entries = sum(1 for entry in self.cache
+        total_entries = len(self.store)
+        expired_entries = sum(1 for entry in self.store
                               if entry.is_expired(self.cache_duration_minutes))
 
         return {
