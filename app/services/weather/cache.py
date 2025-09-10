@@ -4,7 +4,7 @@ import structlog
 from datetime import datetime
 from typing import List, Optional, Any, Dict
 
-from .models import ResponseCacheEntry, WeatherDataType
+from .models import ResponseCacheEntry
 
 logger = structlog.get_logger()
 
@@ -16,26 +16,22 @@ class WeatherCache:
         self.cache: List[ResponseCacheEntry] = []
         self.cache_duration_minutes = cache_duration_minutes
 
-    def get(self, latitude: float, longitude: float,
-            data_type: WeatherDataType,
-            duration_days: Optional[int] = None) -> Optional[Any]:
+    def get(self, cache_key: str, latitude: float, longitude: float) -> Optional[Any]:
         """Retrieve data from cache if available and not expired"""
         for entry in self.cache:
-            if (entry.matches_request(latitude, longitude, data_type, duration_days)
+            if (entry.matches_request(cache_key, latitude, longitude)
                     and not entry.is_expired(self.cache_duration_minutes)):
-                logger.info("Cache hit", data_type=data_type.value)
+                logger.info("Cache hit", cache_key=cache_key.value)
                 return entry.data
         return None
 
-    def set(self, data: Any, latitude: float, longitude: float,
-            data_type: WeatherDataType,
-            duration_days: Optional[int] = None) -> None:
+    def set(self, cache_key: str, data: Any, latitude: float, longitude: float) -> None:
         """Add data to cache"""
         # Remove expired entries and entries for same location/type
         self.cache = [
             entry for entry in self.cache
             if not (entry.is_expired(self.cache_duration_minutes) or
-                    entry.matches_request(latitude, longitude, data_type, duration_days))
+                    entry.matches_request(cache_key, latitude, longitude))
         ]
 
         # Add new entry
@@ -44,11 +40,10 @@ class WeatherCache:
             timestamp=datetime.now(),
             latitude=latitude,
             longitude=longitude,
-            data_type=data_type,
-            duration_days=duration_days
+            cache_key=cache_key,
         )
         self.cache.append(entry)
-        logger.info("Data cached", data_type=data_type.value,
+        logger.info("Data cached", cache_key=cache_key.value,
                     cache_size=len(self.cache))
 
     def clear(self) -> None:

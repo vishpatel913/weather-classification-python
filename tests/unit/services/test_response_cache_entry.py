@@ -46,8 +46,7 @@ class TestResponseCacheEntry:
             cache_keys=["CURRENT"]
         )
 
-        assert entry.matches_request(
-            51.5074, -0.1278, ["CURRENT"]) is True
+        assert entry.matches_request(["CURRENT"], 51.5074, -0.1278) is True
 
     def test_matches_request_within_tolerance(self):
         """Test request matching within coordinate tolerance and key order"""
@@ -62,7 +61,7 @@ class TestResponseCacheEntry:
         # Slightly different coordinates (within ~100m)
         # Different order of keys
         assert entry.matches_request(
-            51.5075, -0.1279, ["DAILY", "CURRENT"]) is True
+            ["DAILY", "CURRENT"], 51.5075, -0.1279) is True
 
     def test_matches_request_different_type(self):
         """Test request matching with different data type"""
@@ -74,5 +73,4 @@ class TestResponseCacheEntry:
             cache_keys=["CURRENT"]
         )
 
-        assert entry.matches_request(
-            51.5074, -0.1278, ["DAILY"]) is False
+        assert entry.matches_request(["DAILY"], 51.5074, -0.1278) is False

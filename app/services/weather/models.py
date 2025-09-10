@@ -36,9 +36,9 @@ class ResponseCacheEntry:
     timestamp: datetime
     data: Any
 
+    cache_keys: list[str]
     latitude: float
     longitude: float
-    cache_keys: list[str]
 
     def is_expired(self, cache_duration_minutes: int = 30) -> bool:
         """Check if cache entry is expired"""
@@ -46,7 +46,7 @@ class ResponseCacheEntry:
             timedelta(minutes=cache_duration_minutes)
         return datetime.now() > expiry_time
 
-    def matches_request(self, lat: float, lon: float, cache_keys: list[str]) -> bool:
+    def matches_request(self, cache_keys: list[str], lat: float, lon: float) -> bool:
         """Check if cache entry matches the request parameters"""
         key_match = set(self.cache_keys) == set(cache_keys)
         # Allow small coordinate differences (within ~100m)
