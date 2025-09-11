@@ -29,29 +29,3 @@ class WeatherApiResponse(TypedDict):
     current_units: Optional[Dict[str, str]]
     hourly_units: Optional[Dict[str, str]]
     daily_units: Optional[Dict[str, str]]
-
-
-@dataclass
-class ResponseCacheEntry:
-    """Represents a cached weather data entry"""
-
-    timestamp: datetime
-    data: Any
-
-    cache_keys: list[str]
-    latitude: float
-    longitude: float
-
-    def is_expired(self, cache_duration_minutes: int = 30) -> bool:
-        """Check if cache entry is expired"""
-        expiry_time = self.timestamp + timedelta(minutes=cache_duration_minutes)
-        return datetime.now() > expiry_time
-
-    def matches_request(self, cache_keys: list[str], lat: float, lon: float) -> bool:
-        """Check if cache entry matches the request parameters"""
-        key_match = set(self.cache_keys) == set(cache_keys)
-        # Allow small coordinate differences (within ~100m)
-        lat_diff = abs(self.latitude - lat) < 0.001
-        lon_diff = abs(self.longitude - lon) < 0.001
-
-        return lat_diff and lon_diff and key_match

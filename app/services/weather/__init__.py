@@ -7,7 +7,7 @@ from .exceptions import (
     WeatherAPIHTTPError,
     WeatherAPIFormatError,
 )
-from .models import WeatherDataType, ResponseCacheEntry
+from .models import WeatherDataType
 
 __all__ = [
     "WeatherService",
@@ -16,5 +16,4 @@ __all__ = [
     "WeatherAPIHTTPError",
     "WeatherAPIFormatError",
     "WeatherDataType",
-    "CacheEntry",
 ]

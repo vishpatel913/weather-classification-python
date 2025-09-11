@@ -1,77 +1,24 @@
-# import pytest
+import pytest
+
 # from unittest.mock import patch
-# from fastapi.testclient import TestClient
+from fastapi.testclient import TestClient
 
-# from app.main import app
-# from app.schemas.HealthCheck import HealthStatus
-
-
-# class TestCurrentWeatherEndpoint:
-#     """Test cases for the current weather endpoint"""
-
-#     def setup_method(self):
-#         """Set up test client"""
-#         self.client = TestClient(app)
-
-#     @patch('app.routers.base_router.health_check')
-#     # @patch('app.routers.base_router.health_check')
-#     # def test_health_check_unhealthy(self, mock_get_health):
-#     #     """Test health check when services are unhealthy"""
-#     #     from app.models.schemas import HealthCheck
-#     #     from datetime import datetime
-#     #     mock_health = HealthCheck(
-#     #         status=HealthStatus.UNHEALTHY,
-#     #         timestamp=datetime.now(),
-#     #         version="0.1.0",
-#     #         uptime_seconds=123.45,
-#     #     )
-#     #     mock_get_health.return_value = mock_health
-#     #     response = self.client.get("/prod/api/health")
-#     #     # Should return 503 for unhealthy status
-#     #     assert response.status_code == 503
-#     # @patch('app.routers.base_router.health_check')
-#     # def test_health_check_degraded(self, mock_get_health):
-#     #     """Test health check when services are degraded"""
-#     #     from app.models.schemas import HealthCheck
-#     #     from datetime import datetime
-#     #     mock_health = HealthCheck(
-#     #         status=HealthStatus.DEGRADED,
-#     #         timestamp=datetime.now(),
-#     #         version="0.1.0",
-#     #         uptime_seconds=123.45,
-#     #     )
-#     #     mock_get_health.return_value = mock_health
-#     #     response = self.client.get("/prod/api/health")
-#     #     # Should return 200 for degraded (service still working)
-#     #     assert response.status_code == 200
-#     #     assert response.json()["status"] == "degraded"
-#     def test_health_check_response_format(self):
-#         """Test that health check response has correct format"""
-#         response = self.client.get("/prod/api/health")
-
-#         # Should be 200 or 503, but always return JSON
-#         assert response.status_code in [200, 503]
-
-#         data = response.json()
-#         required_fields = ["status", "timestamp",
-#                            "version", "uptime_seconds"]
-
-#         for field in required_fields:
-#             assert field in data
-
-#         assert isinstance(data["uptime_seconds"], (int, float))
+from app.main import app
 
 
-# class TestHealthEndpointIntegration:
-#     """Integration tests for health endpoint with real dependencies"""
+@pytest.fixture(name="client")
+def fixture_test_client():
+    """Fixture for test coordinates"""
+    return TestClient(app)
 
-#     def test_real_health_check(self):
-#         """Test health check with real dependencies (may be slow)"""
-#         with TestClient(app) as client:
-#             response = client.get("/prod/api/health")
 
-#             # Should return some response (may be degraded if external APIs are down)
-#             assert response.status_code in [200, 503]
+class TestCurrentWeatherEndpoint:
+    """Test cases for the current weather endpoint"""
 
-#             data = response.json()
-#             assert "status" in data
+    # @patch('app.routers.base_router.health_check')
+    def test_weather_current_successful(self, client):
+        """Test weather when services are unhealthy"""
+
+        response = client.get("/prod/api/v1/weather/current")
+
+        assert response

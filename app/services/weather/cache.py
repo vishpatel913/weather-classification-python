@@ -1,19 +1,45 @@
 """Weather service caching functionality"""
 
-import structlog
-from datetime import datetime
+from dataclasses import dataclass
+from datetime import datetime, timedelta
 from typing import List, Optional, Any, Dict
 
-from .models import ResponseCacheEntry
+import structlog
 
 logger = structlog.get_logger()
+
+
+@dataclass
+class WeatherCacheEntry:
+    """Represents a cached weather entry and data"""
+
+    timestamp: datetime
+    data: Any
+
+    cache_keys: list[str]
+    latitude: float
+    longitude: float
+
+    def is_expired(self, cache_duration_minutes: int = 30) -> bool:
+        """Check if cache entry is expired"""
+        expiry_time = self.timestamp + timedelta(minutes=cache_duration_minutes)
+        return datetime.now() > expiry_time
+
+    def matches_request(self, cache_keys: list[str], lat: float, lon: float) -> bool:
+        """Check if cache entry matches the request parameters"""
+        key_match = set(self.cache_keys) == set(cache_keys)
+        # Allow small coordinate differences (within ~100m)
+        lat_diff = abs(self.latitude - lat) < 0.001
+        lon_diff = abs(self.longitude - lon) < 0.001
+
+        return lat_diff and lon_diff and key_match
 
 
 class WeatherCache:
     """Manages weather data caching"""
 
     def __init__(self, cache_duration_minutes: int = 30):
-        self.store: List[ResponseCacheEntry] = []
+        self.store: List[WeatherCacheEntry] = []
         self.cache_duration_minutes = cache_duration_minutes
 
     def get(
@@ -43,7 +69,7 @@ class WeatherCache:
         ]
 
         # Add new entry
-        entry = ResponseCacheEntry(
+        entry = WeatherCacheEntry(
             data=data,
             timestamp=datetime.now(),
             latitude=latitude,
