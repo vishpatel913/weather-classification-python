@@ -1,7 +1,5 @@
-from datetime import datetime
 import pytest
 
-from app.schemas.metric_value import MetricValue
 from app.schemas.weather_data import WeatherForecastData, WeatherDailyForecastData
 from app.services.weather.exceptions import WeatherAPIFormatError
 from app.services.weather.mappers import map_current_weather, map_daily_weather
@@ -14,9 +12,17 @@ class TestWeatherMappers:
         """Test successful current weather data retrieval"""
         result = map_current_weather(mock_current_weather_api_response)
 
-        # expected_fields = ["temperature", "wind_speed"]
-        # assert all(key in result for key in expected_fields)
         assert isinstance(result, WeatherForecastData)
+        expected_fields = [
+            "time",
+            "weather_code",
+            "is_day",
+            "temperature",
+            "precipitation_probability",
+            "cloud_cover",
+            "uv_index",
+        ]
+        assert all(hasattr(result, key) for key in expected_fields)
 
         assert result.weather_code == 2
         assert result.is_day == 1
@@ -67,6 +73,17 @@ class TestWeatherMappers:
 
         # testing today
         today_result = result[0]
+        expected_fields = [
+            "time",
+            "weather_code",
+            "sunrise",
+            "sunset",
+            "temperature",
+            "precipitation_probability",
+            "precipitation_hours",
+            "uv_index",
+        ]
+        assert all(hasattr(today_result, key) for key in expected_fields)
         assert isinstance(today_result, WeatherDailyForecastData)
 
         assert "2024-09-09" in today_result.time.isoformat()

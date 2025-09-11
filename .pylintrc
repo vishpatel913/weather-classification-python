@@ -1,0 +1,6 @@
+[MASTER]
+load-plugins=pylint_pydantic
+
+[TYPECHECK]
+generated-members=pydantic.*, BaseModel.*
+ignored-classes=pydantic.fields.FieldInfo, BaseModel
