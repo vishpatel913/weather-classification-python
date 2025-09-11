@@ -1,9 +1,9 @@
 mock_coordinates = {
     "latitude": 51.5,
-    "longitude": -0.120000124,
+    "longitude": -0.1278,
 }
 
-mock_base_api_response = {
+mock_base_api_response_data = {
     **mock_coordinates,
     "generationtime_ms": 0.108957290649414,
     "utc_offset_seconds": 3600,
@@ -12,8 +12,8 @@ mock_base_api_response = {
     "elevation": 23,
 }
 
-mock_current_weather_api_response = {
-    **mock_base_api_response,
+mock_current_weather_api_response_data = {
+    **mock_base_api_response_data,
     "current_units": {
         "time": "iso8601",
         "interval": "seconds",
@@ -44,8 +44,8 @@ mock_current_weather_api_response = {
     },
 }
 
-mock_daily_weather_api_response = {
-    **mock_base_api_response,
+mock_daily_weather_api_response_data = {
+    **mock_base_api_response_data,
     "daily_units": {
         "time": "iso8601",
         "weather_code": "wmo code",
@@ -63,8 +63,16 @@ mock_daily_weather_api_response = {
     "daily": {
         "time": ["2024-09-09", "2024-09-10", "2024-09-11"],
         "weather_code": [80, 95, 80],
-        "sunrise": ["2024-09-09T05:26", "2024-09-10T05:28", "2024-09-11T05:29"],
-        "sunset": ["2024-09-09T18:29", "2024-09-10T18:26", "2024-09-11T18:24"],
+        "sunrise": [
+            "2024-09-09T05:26",
+            "2024-09-10T05:28",
+            "2024-09-11T05:29",
+        ],
+        "sunset": [
+            "2024-09-09T18:29",
+            "2024-09-10T18:26",
+            "2024-09-11T18:24",
+        ],
         "temperature_2m_max": [20.0, 18.3, 17.9],
         "temperature_2m_min": [12.5, 15.0, 12.4],
         "apparent_temperature_max": [18.1, 16.7, 14.4],
@@ -76,8 +84,8 @@ mock_daily_weather_api_response = {
     },
 }
 
-mock_hourly_weather_api_response = {
-    **mock_base_api_response,
+mock_hourly_weather_api_response_data = {
+    **mock_base_api_response_data,
     "hourly_units": {
         "time": "iso8601",
         "weather_code": "wmo code",
