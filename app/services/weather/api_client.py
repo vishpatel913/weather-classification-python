@@ -1,10 +1,11 @@
 """Weather API client - handles HTTP communication"""
 
+from typing import Dict, Any, List, Optional
 import httpx
 import structlog
-from typing import Dict, Any
 
-from app.services.weather.models import WeatherApiResponse
+from .cache import WeatherCache
+from .models import WeatherApiParams, WeatherApiResponse
 
 from .exceptions import WeatherAPITimeoutError, WeatherAPIHTTPError, WeatherServiceError
 
@@ -14,19 +15,50 @@ logger = structlog.get_logger()
 class WeatherAPIClient:
     """Handles the actual API communication"""
 
-    def __init__(self, base_url: str, timeout: float):
+    def __init__(
+        self,
+        base_url: str,
+        timeout: float,
+        cache_duration_minutes: Optional[int] = None,
+    ):
         self.base_url = base_url
         self.timeout = timeout
+        self.cache = WeatherCache(cache_duration_minutes)
 
-    async def fetch_weather_data(self, params: Dict[str, Any]) -> WeatherApiResponse:
+    def _get_cache_key(self, params: WeatherApiParams) -> List[str]:
+        cache_keys = [params.get("forecast_days")]
+        for weather_type in ["current", "hourly", "daily"]:
+            if weather_type in params:
+                cache_keys.append(weather_type)
+        return cache_keys
+
+    async def fetch_weather_data(self, params: WeatherApiParams) -> WeatherApiResponse:
         """Generic method to fetch weather data from API"""
         try:
             async with httpx.AsyncClient(timeout=self.timeout) as client:
                 logger.info("Fetching weather data", params=params)
 
+                cache_keys = self._get_cache_key(params)
+                cached_data = self.cache.get(
+                    cache_keys=cache_keys,
+                    latitude=params.get("latitude"),
+                    longitude=params.get("longitude"),
+                )
+                if cached_data:
+                    return cached_data
+
                 response = await client.get(f"{self.base_url}/forecast", params=params)
                 response.raise_for_status()
-                return response.json()
+                raw_data = response.json()
+
+                # Cache the raw result
+                self.cache.set(
+                    cache_keys=cache_keys,
+                    data=raw_data,
+                    latitude=params.get("latitude"),
+                    longitude=params.get("longitude"),
+                )
+                return raw_data
 
         except httpx.TimeoutException as e:
             logger.error("Weather API timeout", error=str(e))

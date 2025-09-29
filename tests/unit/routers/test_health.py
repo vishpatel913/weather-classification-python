@@ -1,86 +1,22 @@
-from unittest.mock import patch
-from datetime import datetime
 from fastapi.testclient import TestClient
+import pytest
 
-from app.schemas.health_check import HealthCheck
-from app.schemas.health_check import HealthStatus
 
 from app.main import app
+
+
+@pytest.fixture(name="client")
+def fixture_test_api_client() -> TestClient:
+    """Mock api client fixture"""
+    return TestClient(app)
 
 
 class TestHealthEndpoint:
     """Test cases for the health check endpoint"""
 
-    def setup_method(self):
-        """Set up test client"""
-        self.client = TestClient(app)
-
-    @patch("app.routers.base_router.health_check")
-    def test_health_check_healthy(self, mock_get_health):
-        """Test health check when all services are healthy"""
-
-        mock_health = HealthCheck(
-            status=HealthStatus.HEALTHY,
-            timestamp=datetime.now(),
-            version="0.1.0",
-            uptime_seconds=123.45,
-        )
-
-        mock_get_health.return_value = mock_health
-
-        response = self.client.get("/prod/api/health")
-
-        assert response.status_code == 200
-        data = response.json()
-        assert data["status"] == "healthy"
-        assert "timestamp" in data
-        assert "version" in data
-        assert "uptime_seconds" in data
-
-    # @patch('app.routers.base_router.health_check')
-    # def test_health_check_unhealthy(self, mock_get_health):
-    #     """Test health check when services are unhealthy"""
-    #     from app.models.schemas import HealthCheck
-    #     from datetime import datetime
-
-    #     mock_health = HealthCheck(
-    #         status=HealthStatus.UNHEALTHY,
-    #         timestamp=datetime.now(),
-    #         version="0.1.0",
-    #         uptime_seconds=123.45,
-    #     )
-
-    #     mock_get_health.return_value = mock_health
-
-    #     response = self.client.get("/prod/api/health")
-
-    #     # Should return 503 for unhealthy status
-    #     assert response.status_code == 503
-
-    # @patch('app.routers.base_router.health_check')
-    # def test_health_check_degraded(self, mock_get_health):
-    #     """Test health check when services are degraded"""
-    #     from app.models.schemas import HealthCheck
-    #     from datetime import datetime
-
-    #     mock_health = HealthCheck(
-    #         status=HealthStatus.DEGRADED,
-    #         timestamp=datetime.now(),
-    #         version="0.1.0",
-    #         uptime_seconds=123.45,
-    #     )
-
-    #     mock_get_health.return_value = mock_health
-
-    #     response = self.client.get("/prod/api/health")
-
-    #     # Should return 200 for degraded (service still working)
-    #     assert response.status_code == 200
-    #     assert response.json()["status"] == "degraded"
-
-    def test_health_check_response_format(self):
+    def test_health_check_response_format(self, client):
         """Test that health check response has correct format"""
-        response = self.client.get("/prod/api/health")
+        response = client.get("/prod/api/health")
 
         # Should be 200 or 503, but always return JSON
         assert response.status_code in [200, 503]

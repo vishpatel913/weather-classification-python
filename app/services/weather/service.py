@@ -4,7 +4,6 @@ from app.schemas.weather_data import WeatherForecastData, WeatherDailyForecastDa
 from app.config import settings
 
 from .api_client import WeatherAPIClient
-from .cache import WeatherCache
 from .mappers import map_current_weather, map_daily_weather
 
 logger = structlog.get_logger()
@@ -52,9 +51,10 @@ class WeatherService:
 
     def __init__(self, cache_duration_minutes: int = 30):
         self.api_client = WeatherAPIClient(
-            settings.weather_api_base_url, settings.weather_api_timeout
+            base_url=settings.weather_api_base_url,
+            timeout=settings.weather_api_timeout,
+            cache_duration_minutes=cache_duration_minutes,
         )
-        self.cache = WeatherCache(cache_duration_minutes)
 
     async def get_current_weather(
         self,
@@ -67,12 +67,6 @@ class WeatherService:
             "Fetching current weather data", latitude=latitude, longitude=longitude
         )
 
-        # Check cache first
-        # TODO: move caching steps to api client
-        # cached_data = self.cache.get(cache_keys, latitude, longitude)
-        # if cached_data:
-        #     return cached_data
-
         # Fetch from API
         params = {
             "latitude": latitude,
@@ -81,8 +75,6 @@ class WeatherService:
         }
 
         raw_data = await self.api_client.fetch_weather_data(params)
-        # Cache the raw result
-        # self.cache.set(cache_keys, raw_data, latitude, longitude)
 
         weather_data = map_current_weather(raw_data)
 
@@ -100,11 +92,6 @@ class WeatherService:
             "Fetching daily weather data", latitude=latitude, longitude=longitude
         )
 
-        # Check cache first
-        # cached_data = self.cache.get(cache_keys, latitude, longitude)
-        # if cached_data:
-        #     return cached_data
-
         # Fetch from API
         params = {
             "latitude": latitude,
@@ -114,8 +101,6 @@ class WeatherService:
         }
 
         raw_data = await self.api_client.fetch_weather_data(params)
-        # Cache the raw result
-        # self.cache.set(cache_keys, raw_data, latitude, longitude)
 
         weather_data = map_daily_weather(raw_data)
 

@@ -1,9 +1,7 @@
 """Weather service data models and enums"""
 
-from dataclasses import dataclass
-from datetime import datetime, timedelta
 from enum import Enum
-from typing import Any, Optional, TypedDict, Dict, List
+from typing import Optional, TypedDict, Dict, List
 
 
 class WeatherDataType(Enum):
@@ -29,3 +27,13 @@ class WeatherApiResponse(TypedDict):
     current_units: Optional[Dict[str, str]]
     hourly_units: Optional[Dict[str, str]]
     daily_units: Optional[Dict[str, str]]
+
+
+class WeatherApiParams(TypedDict):
+    latitude: float
+    longitude: float
+    timezone: str
+    current: Optional[List[str]]
+    daily: Optional[List[str]]
+    hourly: Optional[List[str]]
+    forecast_days: Optional[int] = 3
