@@ -18,7 +18,7 @@ class WeatherForecastData(WeatherForecastBase):
     is_day: bool = Field(..., description="Is day time")
 
     temperature: MetricValue[float] = Field(..., description="Temperature in Celsius")
-    temperature_apparent: MetricValue[float] = Field(
+    apparent_temperature: MetricValue[float] = Field(
         ..., description="Apparent temperature in Celsius"
     )
     humidity: MetricValue[float] = Field(..., description="Humidity percentage")
@@ -41,7 +41,7 @@ class WeatherDailyForecastData(WeatherForecastBase):
     temperature: MetricRangeValue[float] = Field(
         ..., description="Temperature range in Celsius"
     )
-    temperature_apparent: MetricRangeValue[float] = Field(
+    apparent_temperature: MetricRangeValue[float] = Field(
         ..., description="Apparent temperature range in Celsius"
     )
     precipitation_probability: MetricRangeValue[float] = Field(

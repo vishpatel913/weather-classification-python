@@ -25,7 +25,7 @@ def map_current_weather(data: WeatherApiResponse) -> WeatherForecastData:
             weather_code=current["weather_code"]["value"],
             is_day=current["is_day"]["value"],
             temperature=current["temperature_2m"],
-            temperature_apparent=current["apparent_temperature"],
+            apparent_temperature=current["apparent_temperature"],
             humidity=current["relative_humidity_2m"],
             wind_speed=current["wind_speed_10m"],
             precipitation=current["precipitation"],
@@ -78,7 +78,7 @@ def map_daily_weather(data: WeatherApiResponse) -> List[WeatherDailyForecastData
                 sunshine_duration=daily_data["sunshine_duration"][i],
                 precipitation_hours=daily_data["precipitation_hours"][i],
                 temperature=daily_range_data["temperature_2m"],
-                temperature_apparent=daily_range_data["apparent_temperature"],
+                apparent_temperature=daily_range_data["apparent_temperature"],
                 precipitation_probability=daily_range_data["precipitation_probability"],
                 uv_index=daily_range_data["uv_index"],
             )

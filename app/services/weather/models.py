@@ -32,8 +32,13 @@ class WeatherApiResponse(TypedDict):
 class WeatherApiParams(TypedDict):
     latitude: float
     longitude: float
-    timezone: str
+
     current: Optional[List[str]]
     daily: Optional[List[str]]
     hourly: Optional[List[str]]
+
+    timezone: str = "auto"
     forecast_days: Optional[int] = 3
+    wind_speed_unit: Optional[str] = "kmh"
+    temperature_unit: Optional[str] = "celsius"
+    precipitation_unit: Optional[str] = "mm"

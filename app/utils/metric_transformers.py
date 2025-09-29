@@ -1,3 +1,5 @@
+"""Utility functions for merging metric value and unit maps into unified objects."""
+
 from typing import Dict, Union
 from app.schemas.metric_value import MetricValue, MetricRangeValue
 
@@ -5,6 +7,9 @@ from app.schemas.metric_value import MetricValue, MetricRangeValue
 def transform_maps_to_metric(
     value_map: Dict[str, Union[str, int, float]] = None, unit_map: Dict[str, str] = None
 ) -> Dict[str, MetricValue]:
+    """
+    Transform maps of values and their units into a dictionary.
+    """
     metric_map: dict[str, MetricValue] = {}
     value_map = value_map or {}
     unit_map = unit_map or {}
@@ -25,6 +30,9 @@ MIN_SUFFIX = "min"
 def transform_maps_to_metric_range(
     value_map: Dict[str, Union[str, int, float]] = None, unit_map: Dict[str, str] = None
 ) -> Dict[str, MetricRangeValue | MetricValue]:
+    """
+    Transform maps of min/max values and their units into a dictionary.
+    """
     metric_map: dict[str, MetricRangeValue | MetricValue] = {}
     value_map = value_map or {}
     unit_map = unit_map or {}
