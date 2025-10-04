@@ -17,8 +17,15 @@ class TestCurrentWeatherEndpoint:
 
     # @patch('app.routers.base_router.health_check')
     def test_weather_current_successful(self, client):
-        """Test weather when services are unhealthy"""
+        """Test current weather when services are healthy"""
 
         response = client.get("/prod/api/v1/weather/current")
+
+        assert response
+
+    def test_weather_hourly_successful(self, client):
+        """Test hourly weather when services are healthy"""
+
+        response = client.get("/prod/api/v1/weather/hourly")
 
         assert response

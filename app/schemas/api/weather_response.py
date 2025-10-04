@@ -8,13 +8,18 @@ from app.schemas.api.response_base import ResponseBase
 
 
 class WeatherRequestParams(BaseModel):
+    """Schema for the request parameters of weather routes"""
+
     latitude: float = Field(..., ge=-90, le=90, description="Latitude")
     longitude: float = Field(..., ge=-180, le=180, description="Longitude")
-    # duration_hours: Optional[int] = Field(
-    #     default=4, ge=1, le=24, description="Request timeline in hours")
+    forecast_length: Optional[int] = Field(
+        default=3, ge=1, le=16, description="Request timeline in days (1, 3, 7, 14, 16)"
+    )
 
 
 class WeatherForecastResponse(WeatherRequestParams, ResponseBase):
+    """Schema for the response from weather routes"""
+
     # last_updated: datetime = Field(default_factory=datetime.now)
 
     current: Optional[WeatherForecastData] = Field(

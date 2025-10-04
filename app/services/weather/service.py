@@ -4,7 +4,7 @@ from app.schemas.weather_data import WeatherForecastData, WeatherDailyForecastDa
 from app.config import settings
 
 from .api_client import WeatherAPIClient
-from .mappers import map_current_weather, map_daily_weather
+from .mappers import map_current_weather, map_daily_weather, map_hourly_weather
 
 logger = structlog.get_logger()
 
@@ -46,6 +46,7 @@ class WeatherService:
         "timezone": "auto",
         "current": CURRENT_PARAMS,
         "daily": DAILY_PARAMS,
+        "hourly": CURRENT_PARAMS,
         "forecast_days": 3,
     }
 
@@ -84,7 +85,7 @@ class WeatherService:
         self,
         latitude: float,
         longitude: float,
-        duration_days: int = 3,
+        forecast_length: int = 3,
     ) -> list[WeatherDailyForecastData]:
         """Fetch daily weather from Open-Meteo API"""
 
@@ -96,7 +97,7 @@ class WeatherService:
         params = {
             "latitude": latitude,
             "longitude": longitude,
-            "forecast_days": duration_days,
+            "forecast_days": forecast_length,
             **self.DEFAULT_PARAMS,
         }
 
@@ -106,10 +107,28 @@ class WeatherService:
 
         return weather_data
 
-    # def clear_cache(self) -> None:
-    #     """Clear all cached data"""
-    #     self.cache.clear()
+    async def get_hourly_weather(
+        self,
+        latitude: float,
+        longitude: float,
+        forecast_length: int = 1,
+    ) -> list[WeatherForecastData]:
+        """Fetch daily weather from Open-Meteo API"""
 
-    # def get_cache_stats(self) -> Dict[str, Any]:
-    #     """Get cache statistics for monitoring"""
-    #     return self.cache.get_stats()
+        logger.info(
+            "Fetching daily weather data", latitude=latitude, longitude=longitude
+        )
+
+        # Fetch from API
+        params = {
+            "latitude": latitude,
+            "longitude": longitude,
+            "forecast_days": forecast_length,
+            **self.DEFAULT_PARAMS,
+        }
+
+        raw_data = await self.api_client.fetch_weather_data(params)
+
+        weather_data = map_hourly_weather(raw_data)
+
+        return weather_data

@@ -74,3 +74,32 @@ class TestWeatherServiceIntegration:
             assert today_result.temperature.max == 20.0
             assert today_result.temperature.min == 12.5
             assert today_result.temperature.unit == "°C"
+
+    @pytest.mark.asyncio
+    async def test_get_hourly_weather_full_flow(
+        self, weather_service, sample_coordinates, mock_hourly_weather_api_response
+    ):
+        """Test complete hourly weather flow"""
+        with patch.object(
+            weather_service.api_client, "fetch_weather_data"
+        ) as mock_fetch:
+            # Setup mocks
+            mock_fetch.return_value = mock_hourly_weather_api_response
+
+            result = await weather_service.get_hourly_weather(**sample_coordinates)
+
+            # Verify API was only called once
+            mock_fetch.assert_called_once()
+
+            # Both results should be the same
+            assert isinstance(result, list)
+            assert len(result) == 5
+            now_result = result[0]
+            assert isinstance(now_result, WeatherForecastData)
+
+            assert now_result.weather_code == 1
+            assert "2024-09-09T09:00" in now_result.time.isoformat()
+            assert now_result.temperature.value == 15.9
+            assert now_result.temperature.unit == "°C"
+            assert now_result.wind_speed.value == 7.4
+            assert now_result.wind_speed.unit == "km/h"
