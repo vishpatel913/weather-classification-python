@@ -1,9 +1,10 @@
-"""Integration tests for WeatherService"""
+"""Unit tests for WeatherService"""
 
 from unittest.mock import patch
 import pytest
 
 from app.schemas.weather_data import WeatherForecastData, WeatherDailyForecastData
+from app.services.weather.api_client import WeatherAPIClient
 from app.services.weather.service import WeatherService
 
 
@@ -13,93 +14,103 @@ def fixture_weather_service() -> WeatherService:
     return WeatherService()
 
 
-class TestWeatherServiceIntegration:
-    """Integration test cases for the complete WeatherService"""
+@pytest.fixture(name="mock_weather_api_response")
+def fixture_mock_weather_api_response():
+    """Fixture for mocking weather api response"""
+    with patch.object(WeatherAPIClient, "fetch_weather_data") as mock_fetch:
+        yield mock_fetch
+
+
+class TestWeatherService:
+    """Unit test cases for the complete WeatherService"""
 
     @pytest.mark.asyncio
     async def test_get_current_weather_full_flow(
-        self, weather_service, sample_coordinates, mock_current_weather_api_response
+        self,
+        weather_service,
+        mock_weather_api_response,
+        sample_coordinates,
+        mock_current_weather_api_response,
     ):
         """Test complete current weather flow"""
-        with patch.object(
-            weather_service.api_client, "fetch_weather_data"
-        ) as mock_fetch:
-            # Setup mocks
-            mock_fetch.return_value = mock_current_weather_api_response
+        # Setup mocks
+        mock_weather_api_response.return_value = mock_current_weather_api_response
 
-            result = await weather_service.get_current_weather(**sample_coordinates)
+        result = await weather_service.get_current_weather(**sample_coordinates)
 
-            # Verify API was only called once
-            mock_fetch.assert_called_once()
+        # Verify API was only called once
+        mock_weather_api_response.assert_called_once()
 
-            # Both results should be the same
-            assert isinstance(result, WeatherForecastData)
+        # Both results should be the same
+        assert isinstance(result, WeatherForecastData)
 
-            # Mapped values should be as expected
-            assert result.weather_code == 2
-            assert result.is_day == 1
-            assert "2024-09-09T09:00" in result.time.isoformat()
+        # Mapped values should be as expected
+        assert result.weather_code == 2
+        assert result.is_day == 1
+        assert "2024-09-09T09:00" in result.time.isoformat()
 
-            assert result.temperature.value == 16.2
-            assert result.temperature.unit == "°C"
+        assert result.temperature.value == 16.2
+        assert result.temperature.unit == "°C"
 
     @pytest.mark.asyncio
     async def test_get_daily_weather_full_flow(
-        self, weather_service, sample_coordinates, mock_daily_weather_api_response
+        self,
+        weather_service,
+        mock_weather_api_response,
+        sample_coordinates,
+        mock_daily_weather_api_response,
     ):
         """Test complete daily weather flow"""
-        with patch.object(
-            weather_service.api_client, "fetch_weather_data"
-        ) as mock_fetch:
-            # Setup mocks
-            mock_fetch.return_value = mock_daily_weather_api_response
+        # Setup mocks
+        mock_weather_api_response.return_value = mock_daily_weather_api_response
 
-            result = await weather_service.get_daily_weather(**sample_coordinates)
+        result = await weather_service.get_daily_weather(**sample_coordinates)
 
-            # Verify API was only called once
-            mock_fetch.assert_called_once()
+        # Verify API was only called once
+        mock_weather_api_response.assert_called_once()
 
-            # Both results should be the same
-            assert isinstance(result, list)
-            assert len(result) == 3
-            today_result = result[0]
-            assert isinstance(today_result, WeatherDailyForecastData)
+        # Both results should be the same
+        assert isinstance(result, list)
+        assert len(result) == 3
+        today_result = result[0]
+        assert isinstance(today_result, WeatherDailyForecastData)
 
-            # Mapped values should be as expected
+        # Mapped values should be as expected
 
-            assert today_result.weather_code == 80
-            assert "2024-09-09" in today_result.time.isoformat()
-            assert "2024-09-09T05:26" in today_result.sunrise.isoformat()
+        assert today_result.weather_code == 80
+        assert "2024-09-09" in today_result.time.isoformat()
+        assert "2024-09-09T05:26" in today_result.sunrise.isoformat()
 
-            assert today_result.temperature.max == 20.0
-            assert today_result.temperature.min == 12.5
-            assert today_result.temperature.unit == "°C"
+        assert today_result.temperature.max == 20.0
+        assert today_result.temperature.min == 12.5
+        assert today_result.temperature.unit == "°C"
 
     @pytest.mark.asyncio
     async def test_get_hourly_weather_full_flow(
-        self, weather_service, sample_coordinates, mock_hourly_weather_api_response
+        self,
+        weather_service,
+        mock_weather_api_response,
+        sample_coordinates,
+        mock_hourly_weather_api_response,
     ):
         """Test complete hourly weather flow"""
-        with patch.object(
-            weather_service.api_client, "fetch_weather_data"
-        ) as mock_fetch:
-            # Setup mocks
-            mock_fetch.return_value = mock_hourly_weather_api_response
+        # Setup mocks
+        mock_weather_api_response.return_value = mock_hourly_weather_api_response
 
-            result = await weather_service.get_hourly_weather(**sample_coordinates)
+        result = await weather_service.get_hourly_weather(**sample_coordinates)
 
-            # Verify API was only called once
-            mock_fetch.assert_called_once()
+        # Verify API was only called once
+        mock_weather_api_response.assert_called_once()
 
-            # Both results should be the same
-            assert isinstance(result, list)
-            assert len(result) == 5
-            now_result = result[0]
-            assert isinstance(now_result, WeatherForecastData)
+        # Both results should be the same
+        assert isinstance(result, list)
+        assert len(result) == 5
+        now_result = result[0]
+        assert isinstance(now_result, WeatherForecastData)
 
-            assert now_result.weather_code == 1
-            assert "2024-09-09T09:00" in now_result.time.isoformat()
-            assert now_result.temperature.value == 15.9
-            assert now_result.temperature.unit == "°C"
-            assert now_result.wind_speed.value == 7.4
-            assert now_result.wind_speed.unit == "km/h"
+        assert now_result.weather_code == 1
+        assert "2024-09-09T09:00" in now_result.time.isoformat()
+        assert now_result.temperature.value == 15.9
+        assert now_result.temperature.unit == "°C"
+        assert now_result.wind_speed.value == 7.4
+        assert now_result.wind_speed.unit == "km/h"

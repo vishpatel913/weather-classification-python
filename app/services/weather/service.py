@@ -85,7 +85,7 @@ class WeatherService:
         self,
         latitude: float,
         longitude: float,
-        forecast_length: int = 3,
+        forecast_length: int = DEFAULT_PARAMS["forecast_days"],
     ) -> list[WeatherDailyForecastData]:
         """Fetch daily weather from Open-Meteo API"""
 
@@ -97,8 +97,8 @@ class WeatherService:
         params = {
             "latitude": latitude,
             "longitude": longitude,
-            "forecast_days": forecast_length,
             **self.DEFAULT_PARAMS,
+            "forecast_days": forecast_length,
         }
 
         raw_data = await self.api_client.fetch_weather_data(params)

@@ -34,7 +34,8 @@ async def get_current(
     """Handler for getting current weather conditions"""
     logger.info("Requesting current weather...")
     current = await weather_service.get_current_weather(
-        latitude=query.latitude, longitude=query.longitude
+        latitude=query.latitude,
+        longitude=query.longitude,
     )
     daily = await weather_service.get_daily_weather(
         latitude=query.latitude, longitude=query.longitude
@@ -45,7 +46,6 @@ async def get_current(
     return WeatherForecastResponse(
         latitude=query.latitude,
         longitude=query.longitude,
-        forecast_length=query.forecast_length,
         current=current,
         today=daily[0],
     )
