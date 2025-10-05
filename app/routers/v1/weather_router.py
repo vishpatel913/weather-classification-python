@@ -1,6 +1,6 @@
 """Weather Router module for handling weather-related API endpoints."""
 
-from typing import Annotated
+from typing import Annotated, Optional
 from fastapi import APIRouter, Depends, Query
 import structlog
 
@@ -18,9 +18,12 @@ WeatherRouter = APIRouter(prefix="/v1/weather", tags=["weather"])
 async def get_weather_params(
     latitude: Annotated[float, Query(..., ge=-90, le=90)],
     longitude: Annotated[float, Query(..., ge=-180, le=180)],
+    forecast_length: Annotated[Optional[int], Query(..., ge=-180, le=180)] = 3,
 ):
     """Extracts and returns weather request parameters from query."""
-    return WeatherRequestParams(latitude=latitude, longitude=longitude)
+    return WeatherRequestParams(
+        latitude=latitude, longitude=longitude, forecast_length=forecast_length
+    )
 
 
 def get_weather_service():
