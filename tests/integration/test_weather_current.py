@@ -59,8 +59,11 @@ class TestCurrentWeatherEndpoint:
 
         assert data["latitude"] == sample_coordinates["latitude"]
         assert data["longitude"] == sample_coordinates["longitude"]
-        assert data["forecast_length"] == 3
 
+        assert "2024-09-09T09:00" in data["current"]["time"]
         assert data["current"]["weather_code"] == 2
         assert data["current"]["is_day"] == 1
-        assert "2024-09-09T09:00" in data["current"]["time"]
+
+        assert "2024-09-09" in data["today"]["time"]
+        assert "5:26:00" in data["today"]["sunrise"]
+        assert data["today"]["weather_code"] == 80

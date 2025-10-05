@@ -27,18 +27,20 @@ def get_weather_service():
 
 
 @WeatherRouter.get("/current", response_model=WeatherForecastResponse)
-async def get_current(
+async def get_current_forecast(
     query: Annotated[WeatherRequestParams, Depends(get_weather_params)],
     weather_service: WeatherService = Depends(get_weather_service),
 ):
     """Handler for getting current weather conditions"""
     logger.info("Requesting current weather...")
+
     current = await weather_service.get_current_weather(
         latitude=query.latitude,
         longitude=query.longitude,
     )
     daily = await weather_service.get_daily_weather(
-        latitude=query.latitude, longitude=query.longitude
+        latitude=query.latitude,
+        longitude=query.longitude,
     )
 
     logger.info("Requested current weather")
