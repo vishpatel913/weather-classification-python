@@ -1,3 +1,5 @@
+"""Weather Router module for handling weather-related API endpoints."""
+
 from typing import Annotated
 from fastapi import APIRouter, Depends, Query
 import structlog
@@ -54,7 +56,7 @@ async def get_current_forecast(
 
 
 @WeatherRouter.get("/hourly", response_model=WeatherForecastResponse)
-async def get_hourly(
+async def get_hourly_forecast(
     query: Annotated[WeatherRequestParams, Depends(get_weather_params)],
     weather_service: WeatherService = Depends(get_weather_service),
 ):

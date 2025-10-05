@@ -60,10 +60,46 @@ class TestCurrentWeatherEndpoint:
         assert data["latitude"] == sample_coordinates["latitude"]
         assert data["longitude"] == sample_coordinates["longitude"]
 
-        assert "2024-09-09T09:00" in data["current"]["time"]
-        assert data["current"]["weather_code"] == 2
-        assert data["current"]["is_day"] == 1
+        current_result = data["current"]
+        expected_current_fields = [
+            "time",
+            "weather_code",
+            "is_day",
+            "temperature",
+            "apparent_temperature",
+            "humidity",
+            "wind_speed",
+            "precipitation",
+            "precipitation_probability",
+            "cloud_cover",
+            "uv_index",
+        ]
+        assert all(key in current_result for key in expected_current_fields)
 
-        assert "2024-09-09" in data["today"]["time"]
-        assert "5:26:00" in data["today"]["sunrise"]
-        assert data["today"]["weather_code"] == 80
+        assert "2024-09-09T09:00" in current_result["time"]
+        assert current_result["weather_code"] == 2
+        assert current_result["is_day"] == 1
+        assert current_result["temperature"]["value"] == 16.2
+        assert current_result["temperature"]["unit"] == "°C"
+
+        today_result = data["today"]
+        expected_daily_fields = [
+            "time",
+            "weather_code",
+            "sunrise",
+            "sunset",
+            "sunshine_duration",
+            "temperature",
+            "apparent_temperature",
+            "precipitation_probability",
+            "precipitation_hours",
+            "uv_index",
+        ]
+        assert all(key in today_result for key in expected_daily_fields)
+
+        assert "2024-09-09" in today_result["time"]
+        assert "5:26:00" in today_result["sunrise"]
+        assert today_result["weather_code"] == 80
+        assert today_result["temperature"]["min"] == 12.5
+        assert today_result["temperature"]["max"] == 20.0
+        assert today_result["temperature"]["unit"] == "°C"
