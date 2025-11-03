@@ -21,7 +21,7 @@ jobs:
         uses: ./.github/actions/setup-install-dependencies
         with:
           python-version: "3.13"
-          requirements-files: "requirements.txt requirements-dev.txt"
+          requirements-files: "requirements-dev.txt"
 
   lint:
     name: 🔎 Lint with Pylint
@@ -38,7 +38,7 @@ jobs:
         uses: ./.github/actions/setup-install-dependencies
         with:
           python-version: "3.13"
-          requirements-files: "requirements.txt requirements-dev.txt"
+          requirements-files: "requirements-dev.txt"
 
       - name: 🔎 Run Pylint
         run: |
@@ -57,7 +57,7 @@ jobs:
         uses: ./.github/actions/setup-install-dependencies
         with:
           python-version: "3.13"
-          requirements-files: "requirements.txt requirements-dev.txt"
+          requirements-files: "requirements-dev.txt"
 
       - name: 🧪 Run Pytest
         run: |

@@ -11,7 +11,9 @@ from app.config import settings
 
 
 @asynccontextmanager
-async def lifespan():
+async def lifespan(
+    app: FastAPI,  # pylint: disable=redefined-outer-name, unused-argument
+):
     """Lifespan context manager for startup and shutdown events."""
     # Startup
     print(f"Starting {settings.app_name} v{settings.app_version}")
