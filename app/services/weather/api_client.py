@@ -45,11 +45,9 @@ class WeatherAPIClient:
                     longitude=params.get("longitude"),
                 )
                 if cached_data:
-                    print("----------- Using cached weather data")
                     return cached_data
 
                 response = await client.get(f"{self.base_url}/forecast", params=params)
-                print("----------- REQUEST MADE TO WEATHER API")
                 response.raise_for_status()
                 raw_data = response.json()
 
