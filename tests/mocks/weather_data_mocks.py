@@ -62,7 +62,7 @@ mock_daily_weather_api_response_data = {
     },
     "daily": {
         "time": ["2024-09-09", "2024-09-10", "2024-09-11"],
-        "weather_code": [80, 95, 80],
+        "weather_code": [80, 95, 1],
         "sunrise": [
             "2024-09-09T05:26",
             "2024-09-10T05:28",

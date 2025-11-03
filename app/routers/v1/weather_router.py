@@ -79,3 +79,26 @@ async def get_hourly_forecast(
         forecast_length=query.forecast_length,
         hourly=hourly,
     )
+
+
+@WeatherRouter.get("/daily", response_model=WeatherForecastResponse)
+async def get_daily_forecast(
+    query: Annotated[WeatherRequestParams, Depends(get_weather_params)],
+    weather_service: WeatherService = Depends(get_weather_service),
+):
+    """Handler for getting daily weather conditions"""
+    logger.info("Requesting daily weather...")
+    daily = await weather_service.get_daily_weather(
+        latitude=query.latitude,
+        longitude=query.longitude,
+        forecast_length=query.forecast_length,
+    )
+
+    logger.info("Requested daily weather")
+
+    return WeatherForecastResponse(
+        latitude=query.latitude,
+        longitude=query.longitude,
+        forecast_length=query.forecast_length,
+        daily=daily,
+    )
