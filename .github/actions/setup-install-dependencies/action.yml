@@ -1,0 +1,48 @@
+name: "Python Setup and Install"
+description: "Sets up Python, caches a venv, and installs requirements."
+inputs:
+  python-version:
+    description: "The Python version to use"
+    required: true
+    default: "3.13"
+  requirements-files:
+    description: "Space-separated list of requirements files (e.g., 'requirements.txt requirements-dev.txt')"
+    required: true
+    default: "requirements.txt requirements-dev.txt"
+
+runs:
+  using: "composite"
+  steps:
+    - name: 🐍 Set up Python ${{ inputs.python-version }}
+      uses: actions/setup-python@v5
+      with:
+        python-version: ${{ inputs.python-version }}
+
+    - name: ⚙️ Cache venv and dependencies
+      uses: actions/cache@v4
+      id: cache-venv
+      with:
+        path: .venv
+        key: ${{ runner.os }}-${{ inputs.python-version }}-${{ hashFiles(inputs.requirements-files) }}
+        restore-keys: |
+          ${{ runner.os }}-${{ inputs.python-version }}-
+
+    - name: 📦 Install dependencies into venv
+      shell: bash
+      if: steps.cache-venv.outputs.cache-hit != 'true'
+      run: |
+        python -m venv .venv
+        source .venv/bin/activate
+        python -m pip install --upgrade pip
+
+        # Loop through all requirement files and install them
+        for file in ${{ inputs.requirements-files }}; do
+          if [ -f "$file" ]; then pip install -r "$file"; fi
+        done
+
+    - name: 🌍 Set environment variables for venv activation
+      shell: bash
+      run: |
+        # Set environment variables for subsequent steps in the same job
+        echo "VIRTUAL_ENV=$PWD/.venv" >> $GITHUB_ENV
+        echo "$PWD/.venv/bin" >> $GITHUB_PATH
