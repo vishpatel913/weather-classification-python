@@ -1,4 +1,3 @@
-# .github/actions/setup-and-install/action.yml
 name: "Python Setup and Install Dependencies"
 description: "Sets up Python, and installs requirements and dependencies with cache."
 inputs:
