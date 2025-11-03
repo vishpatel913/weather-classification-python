@@ -11,7 +11,7 @@ permissions:
 
 env:
   AWS_REGION: us-east-1
-  ECR_REPOSITORY: tee-shirt-weather-api
+  ECR_REPOSITORY: t-shirt-weather-api
 
 jobs:
   deploy:
