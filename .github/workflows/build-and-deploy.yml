@@ -2,8 +2,8 @@ name: Deploy to Lambda
 
 on:
   workflow_dispatch:
-  push:
-    branches: [ main ]
+  # push:
+  #   branches: [ main ]
 
 permissions:
   id-token: write
