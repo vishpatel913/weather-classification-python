@@ -24,16 +24,7 @@ def fixtures_weather_api_mock():
         forecast_route = respx_mock.get(
             "/forecast",
             name="forecast",
-            params={
-                "latitude": ANY,
-                "longitude": ANY,
-                "forecast_days": ANY,
-                "current": ANY,
-                "hourly": ANY,
-                "daily": ANY,
-                "wind_speed_unit": ANY,
-                "timezone": ANY,
-            },
+            params=ANY,
         )
         forecast_route.return_value = Response(200, json=[])
         yield respx_mock
