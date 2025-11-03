@@ -16,7 +16,7 @@ class TestHealthEndpoint:
 
     def test_health_check_response_format(self, client):
         """Test that health check response has correct format"""
-        response = client.get("/prod/api/health")
+        response = client.get("/dev/api/health")
 
         # Should be 200 or 503, but always return JSON
         assert response.status_code in [200, 503]
@@ -36,7 +36,7 @@ class TestHealthEndpointIntegration:
     def test_real_health_check(self):
         """Test health check with real dependencies (may be slow)"""
         with TestClient(app) as client:
-            response = client.get("/prod/api/health")
+            response = client.get("/dev/api/health")
 
             # Should return some response (may be degraded if external APIs are down)
             assert response.status_code in [200, 503]

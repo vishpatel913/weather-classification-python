@@ -35,7 +35,7 @@ class TestHourlyWeatherEndpoint:
 
         result = test_client.get(
             (
-                "/prod/api/v1/weather/hourly?"
+                "/dev/api/v1/weather/hourly?"
                 "forecast_length=1&"
                 f"latitude={sample_coordinates['latitude']}&"
                 f"longitude={sample_coordinates['longitude']}"

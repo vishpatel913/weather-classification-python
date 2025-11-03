@@ -33,7 +33,7 @@ class TestDailyWeatherEndpoint:
 
         result = test_client.get(
             (
-                "/prod/api/v1/weather/daily?"
+                "/dev/api/v1/weather/daily?"
                 "forecast_length=3&"
                 f"latitude={sample_coordinates['latitude']}&"
                 f"longitude={sample_coordinates['longitude']}"

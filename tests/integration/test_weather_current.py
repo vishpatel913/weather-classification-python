@@ -35,7 +35,7 @@ class TestCurrentWeatherEndpoint:
 
         result = test_client.get(
             (
-                "/prod/api/v1/weather/current?"
+                "/dev/api/v1/weather/current?"
                 f"latitude={sample_coordinates['latitude']}&"
                 f"longitude={sample_coordinates['longitude']}"
             )
