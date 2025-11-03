@@ -17,7 +17,7 @@ jobs:
     outputs:
       ecr-repository: ${{ steps.tf-output.outputs.ecr-repository }}
       lambda-function-name: ${{ steps.tf-output.outputs.lambda-function-name }}
-    
+
     steps:
     - name: Checkout
       uses: actions/checkout@v3
@@ -49,5 +49,9 @@ jobs:
       id: tf-output
       working-directory: ./infrastructure
       run: |
-        echo "ecr-repository=$(terraform output -raw ecr_repository_url)" >> $GITHUB_OUTPUT
-        echo "lambda-function-name=$(terraform output -raw lambda_function_name)" >> $GITHUB_OUTPUT
+        echo "ecr-repository<<EOF" >> $GITHUB_OUTPUT
+        terraform output -raw ecr_repository_url >> $GITHUB_OUTPUT
+        echo "EOF" >> $GITHUB_OUTPUT
+        echo "lambda-function-name<<EOF" >> $GITHUB_OUTPUT
+        terraform output -raw lambda_function_name >> $GITHUB_OUTPUT
+        echo "EOF" >> $GITHUB_OUTPUT
