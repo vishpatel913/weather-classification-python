@@ -21,7 +21,7 @@ def fixtures_weather_api_mock():
         base_url=settings.weather_api_base_url, assert_all_called=False
     ) as httpx_mock:
         forecast_route = httpx_mock.get(
-            "/forecast",
+            path="/forecast",
             name="forecast",
         )
         forecast_route.return_value = Response(200, json=[])
