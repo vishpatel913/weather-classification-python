@@ -1,6 +1,5 @@
 """Pytest configuration and fixtures for tests"""
 
-from unittest.mock import ANY
 from httpx import Response
 import pytest
 import respx
@@ -18,13 +17,15 @@ from .mocks.weather_data_mocks import (
 @pytest.fixture(name="weather_api_mock")
 def fixtures_weather_api_mock():
     """Fixture to mock weather API calls"""
-    with respx.mock(base_url=settings.weather_api_base_url) as respx_mock:
-        forecast_route = respx_mock.get(
+    with respx.mock(
+        base_url=settings.weather_api_base_url, assert_all_called=False
+    ) as httpx_mock:
+        forecast_route = httpx_mock.get(
             "/forecast",
             name="forecast",
         )
         forecast_route.return_value = Response(200, json=[])
-        yield respx_mock
+        yield httpx_mock
 
 
 # MOCK DATA
