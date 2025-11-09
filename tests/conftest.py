@@ -15,14 +15,16 @@ from .mocks.weather_data_mocks import (
 
 # MOCK API
 @pytest.fixture(name="weather_api_mock")
-def fixtures_weather_api_mock(respx_mock):
+def fixtures_weather_api_mock():
     """Fixture to mock weather API calls"""
-    forecast_route = respx_mock.get(
-        url__regex=r"https://api\.open-meteo\.com/v1/forecast\?.*",
-        name="forecast",
-    )
-    forecast_route.mock(return_value=Response(200, json=[]))
-    yield respx_mock
+    print("Setting up weather API mock")
+    print(f"URL: {settings.weather_api_base_url}")
+    with respx.mock(
+        base_url=settings.weather_api_base_url, assert_all_called=True
+    ) as respx_mock:
+        forecast_route = respx_mock.get("/forecast", name="forecast")
+        forecast_route.return_value = Response(200, json=[])
+        yield respx_mock
 
 
 # MOCK DATA
