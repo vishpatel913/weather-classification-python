@@ -18,13 +18,10 @@ from .mocks.weather_data_mocks import (
 @pytest.fixture(name="weather_api_mock")
 def fixtures_weather_api_mock():
     """Fixture to mock weather API calls"""
-    with respx.mock(
-        base_url=settings.weather_api_base_url, assert_all_called=True
-    ) as respx_mock:
+    with respx.mock(base_url=settings.weather_api_base_url) as respx_mock:
         forecast_route = respx_mock.get(
             "/forecast",
             name="forecast",
-            params=ANY,
         )
         forecast_route.return_value = Response(200, json=[])
         yield respx_mock

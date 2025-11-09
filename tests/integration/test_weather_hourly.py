@@ -22,13 +22,11 @@ class TestHourlyWeatherEndpoint:
         weather_api_mock,
         sample_coordinates,
         mock_hourly_weather_api_response,
-        mock_daily_weather_api_response,
     ):
         """Test hourly weather when services are healthy"""
         weather_api_mock["forecast"].respond(
             json={
                 **mock_hourly_weather_api_response,
-                **mock_daily_weather_api_response,
             },
             status_code=200,
         )
