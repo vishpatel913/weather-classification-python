@@ -1,3 +1,5 @@
+"""Unit tests for metric range transformer utilities"""
+
 from app.utils.metric_transformers import transform_maps_to_metric_range
 
 
@@ -8,7 +10,7 @@ class TestMetricRangeTransformUtils:
         """Test successful transform when inputs are missing"""
 
         result = transform_maps_to_metric_range()
-        assert result == {}
+        assert not result
 
     def test_return_empty_maps_success(self):
         """Test successful transform when inputs are empty"""
@@ -16,7 +18,7 @@ class TestMetricRangeTransformUtils:
         mock_unit_map = {}
         result = transform_maps_to_metric_range(mock_value_map, mock_unit_map)
 
-        assert result == {}
+        assert not result
 
     def test_return_valid_maps_success(self):
         """Test successful transform when inputs are valid"""

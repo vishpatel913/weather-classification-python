@@ -1,6 +1,5 @@
 """Pytest configuration and fixtures for tests"""
 
-from unittest.mock import ANY
 from httpx import Response
 import pytest
 import respx
