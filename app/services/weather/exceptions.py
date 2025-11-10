@@ -4,13 +4,9 @@
 class WeatherServiceError(Exception):
     """Base exception for weather service errors"""
 
-    pass
-
 
 class WeatherAPITimeoutError(WeatherServiceError):
     """Raised when the weather API times out"""
-
-    pass
 
 
 class WeatherAPIHTTPError(WeatherServiceError):
@@ -23,5 +19,3 @@ class WeatherAPIHTTPError(WeatherServiceError):
 
 class WeatherAPIFormatError(WeatherServiceError):
     """Raised when the weather API returns unexpected data format"""
-
-    pass

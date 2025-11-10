@@ -77,3 +77,11 @@ class WeatherAPIClient:
         except Exception as e:
             logger.error("Unexpected weather API error", error=str(e))
             raise WeatherServiceError("Weather service unavailable") from e
+
+    def clear_cache(self) -> None:
+        """Clear the weather data cache"""
+        self.cache.clear()
+
+    def get_cache_stats(self) -> dict:
+        """Get statistics about the weather data cache"""
+        return self.cache.get_stats()

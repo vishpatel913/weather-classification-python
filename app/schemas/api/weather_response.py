@@ -1,7 +1,7 @@
+"""Schema definitions for weather response."""
+
 from typing import Optional
 from pydantic import BaseModel, Field
-
-# from datetime import datetime
 
 from app.schemas.weather_data import WeatherForecastData, WeatherDailyForecastData
 from app.schemas.api.response_base import ResponseBase
@@ -19,8 +19,6 @@ class WeatherRequestParams(BaseModel):
 
 class WeatherForecastResponse(WeatherRequestParams, ResponseBase):
     """Schema for the response from weather routes"""
-
-    # last_updated: datetime = Field(default_factory=datetime.now)
 
     current: Optional[WeatherForecastData] = Field(
         None, description="Current forecast for requested coords"

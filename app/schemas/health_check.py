@@ -1,16 +1,22 @@
-from pydantic import BaseModel
+"""Schema definitions for health check responses."""
+
+from enum import Enum
 from datetime import datetime
 from typing import Optional
-from enum import Enum
+from pydantic import BaseModel
 
 
 class HealthStatus(str, Enum):
+    """Enum of possible health statuses."""
+
     HEALTHY = "healthy"
     UNHEALTHY = "unhealthy"
     DEGRADED = "degraded"
 
 
 class HealthCheck(BaseModel):
+    """Schema for health check response."""
+
     status: HealthStatus
     timestamp: datetime
     version: str

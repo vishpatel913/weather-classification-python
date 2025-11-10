@@ -1,3 +1,5 @@
+"""Tests for the health check endpoint of the FastAPI application."""
+
 from fastapi.testclient import TestClient
 import pytest
 

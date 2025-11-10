@@ -137,10 +137,8 @@ def test_clear_method(weather_cache):
 #     )
 #     weather_cache.set(["expired"], {"data": 2}, 51.6, -0.2)
 
-#     # Act
 #     stats = weather_cache.get_stats()
 
-#     # Assert
 #     assert stats["total_entries"] == 2
 #     assert stats["expired_entries"] == 1
 #     assert stats["active_entries"] == 1
