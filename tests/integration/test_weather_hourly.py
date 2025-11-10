@@ -1,4 +1,4 @@
-# """Integration tests for current weather endpoint"""
+"""Integration tests for hourly weather endpoint"""
 
 import pytest
 from fastapi.testclient import TestClient

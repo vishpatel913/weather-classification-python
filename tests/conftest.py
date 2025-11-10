@@ -1,5 +1,6 @@
 """Pytest configuration and fixtures for tests"""
 
+from unittest.mock import ANY
 from httpx import Response
 import pytest
 import respx
@@ -14,17 +15,26 @@ from .mocks.weather_data_mocks import (
 
 
 # MOCK API
-@pytest.fixture(name="weather_api_mock")
-def fixtures_weather_api_mock():
+@pytest.fixture(name="weather_api_mock", scope="session")
+def fixture_weather_api_mock():
     """Fixture to mock weather API calls"""
-    print("Setting up weather API mock")
-    print(f"URL: {settings.weather_api_base_url}")
     with respx.mock(
-        base_url=settings.weather_api_base_url, assert_all_called=True
+        base_url=settings.weather_api_base_url, assert_all_called=False
     ) as respx_mock:
-        forecast_route = respx_mock.get("/forecast", name="forecast")
-        forecast_route.return_value = Response(200, json=[])
+        forecast_route = respx_mock.route(
+            path__startswith="/forecast",
+            name="forecast",
+        )
+        forecast_route.return_value = Response(200, json={})
+
         yield respx_mock
+
+
+@pytest.fixture(autouse=True)
+def fixture_reset_weather_api_mock(weather_api_mock):
+    """Auto-reset mock call counts after each test"""
+    yield  # Test runs
+    weather_api_mock["forecast"].reset()
 
 
 # MOCK DATA

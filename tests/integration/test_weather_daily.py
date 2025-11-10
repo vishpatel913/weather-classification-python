@@ -1,4 +1,4 @@
-"""Integration tests for current weather endpoint"""
+"""Integration tests for daily weather endpoint"""
 
 import pytest
 from fastapi.testclient import TestClient
@@ -15,7 +15,7 @@ class TestDailyWeatherEndpoint:
     """Test cases for the daily weather endpoint"""
 
     @pytest.mark.asyncio
-    async def test_weather_current_successful(
+    async def test_weather_daily_successful(
         self,
         *,
         test_client,
