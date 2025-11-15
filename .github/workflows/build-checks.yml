@@ -2,6 +2,7 @@ name: Build, Lint and Test
 
 on:
   workflow_dispatch:
+  workflow_call:
   pull_request:
     branches: ["main"]
 
@@ -22,6 +23,26 @@ jobs:
         with:
           python-version: "3.13"
           requirements-files: "requirements-dev.txt"
+
+  compile:
+    name: 🏗️ Validate Python Build
+    runs-on: ubuntu-latest
+    needs: setup
+
+    steps:
+      - name: ⬇️ Checkout code
+        uses: actions/checkout@v4
+
+      - name: ⚡️ Setup dependencies
+        uses: ./.github/actions/setup-install-dependencies
+        with:
+          python-version: "3.13"
+          requirements-files: "requirements-dev.txt"
+
+      - name: 🏗️ Compile Python files
+        run: |
+          python -m py_compile $(git ls-files '*.py')
+          echo "✅ All Python files compile successfully"
 
   lint:
     name: 🔎 Lint with Pylint

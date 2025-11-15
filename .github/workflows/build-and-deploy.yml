@@ -14,8 +14,14 @@ env:
   ECR_REPOSITORY: t-shirt-weather-api
 
 jobs:
+  build-check:
+    uses: ./.github/workflows/build-check.yml
+    permissions:
+      contents: read
+
   deploy:
     runs-on: ubuntu-latest
+    needs: build-check
 
     steps:
     - name: Checkout
