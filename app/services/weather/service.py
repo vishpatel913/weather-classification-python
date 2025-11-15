@@ -1,3 +1,5 @@
+"""Service to fetch weather data from Open-Meteo API"""
+
 import structlog
 
 from app.schemas.weather_data import WeatherForecastData, WeatherDailyForecastData

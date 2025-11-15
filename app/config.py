@@ -1,3 +1,5 @@
+"""Configuration settings for the Service."""
+
 from typing import Literal
 from pydantic import Field
 from pydantic_settings import BaseSettings, SettingsConfigDict
@@ -6,8 +8,9 @@ LogLevel = Literal["DEBUG", "INFO", "WARNING", "ERROR"]
 
 
 class Settings(BaseSettings):
-    # Application settings
-    app_name: str = Field(default="Weather Classification Service")
+    """Application configuration settings."""
+
+    app_name: str = Field(default="T-Shirt Weather Service")
     app_version: str = Field(default="0.1.0")
     debug: bool = Field(default=False)
     host: str = Field(default="0.0.0.0")

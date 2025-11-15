@@ -5,6 +5,8 @@ from typing import Optional, TypedDict, Dict, List
 
 
 class WeatherDataType(Enum):
+    """Enum for different weather data types"""
+
     CURRENT = "current"
     DAILY = "daily"
     HOURLY = "hourly"
@@ -14,6 +16,8 @@ WeatherApiResponseValue = str | int | float
 
 
 class WeatherApiResponse(TypedDict):
+    """Model for weather API response"""
+
     latitude: float
     longitude: float
     generationtime_ms: float
@@ -30,6 +34,8 @@ class WeatherApiResponse(TypedDict):
 
 
 class WeatherApiParams(TypedDict):
+    """Model for weather API request parameters"""
+
     latitude: float
     longitude: float
 

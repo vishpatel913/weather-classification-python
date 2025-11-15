@@ -1,3 +1,5 @@
+"""Base router for the FastAPI application."""
+
 from datetime import datetime
 from fastapi import APIRouter
 import structlog

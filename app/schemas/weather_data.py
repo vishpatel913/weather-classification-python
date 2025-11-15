@@ -1,3 +1,5 @@
+"""Schema definitions for weather data."""
+
 from datetime import datetime
 from pydantic import BaseModel, Field
 
@@ -5,6 +7,8 @@ from app.schemas.metric_value import MetricValue, MetricRangeValue
 
 
 class WeatherForecastBase(BaseModel):
+    """Base schema for weather forecast data."""
+
     time: datetime = Field(default_factory=datetime.now)
     weather_code: int = Field(
         ...,
@@ -15,6 +19,8 @@ class WeatherForecastBase(BaseModel):
 
 
 class WeatherForecastData(WeatherForecastBase):
+    """Schema for current weather forecast data."""
+
     is_day: bool = Field(..., description="Is day time")
 
     temperature: MetricValue[float] = Field(..., description="Temperature in Celsius")
@@ -32,6 +38,8 @@ class WeatherForecastData(WeatherForecastBase):
 
 
 class WeatherDailyForecastData(WeatherForecastBase):
+    """Schema for daily weather forecast data."""
+
     sunrise: datetime = Field(..., description="Time of sun rise")
     sunset: datetime = Field(..., description="Time of sun set")
     sunshine_duration: float = Field(

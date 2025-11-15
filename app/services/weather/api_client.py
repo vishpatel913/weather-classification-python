@@ -45,11 +45,9 @@ class WeatherAPIClient:
                     longitude=params.get("longitude"),
                 )
                 if cached_data:
-                    print("----------- Using cached weather data")
                     return cached_data
 
                 response = await client.get(f"{self.base_url}/forecast", params=params)
-                print("----------- REQUEST MADE TO WEATHER API")
                 response.raise_for_status()
                 raw_data = response.json()
 
@@ -79,3 +77,11 @@ class WeatherAPIClient:
         except Exception as e:
             logger.error("Unexpected weather API error", error=str(e))
             raise WeatherServiceError("Weather service unavailable") from e
+
+    def clear_cache(self) -> None:
+        """Clear the weather data cache"""
+        self.cache.clear()
+
+    def get_cache_stats(self) -> dict:
+        """Get statistics about the weather data cache"""
+        return self.cache.get_stats()

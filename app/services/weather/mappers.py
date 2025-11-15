@@ -1,3 +1,5 @@
+"""Utils to map weather API responses to internal data models"""
+
 from typing import List
 
 import structlog
@@ -98,7 +100,7 @@ def map_daily_weather(data: WeatherApiResponse) -> List[WeatherDailyForecastData
 
 
 def map_hourly_weather(data: WeatherApiResponse) -> List[WeatherForecastData]:
-    """Map daily weather API response to list of WeatherDailyForecastData"""
+    """Map hourly weather API response to list of WeatherForecastData"""
     try:
         hourly_data = data["hourly"]
         hourly_units = data["hourly_units"]
@@ -142,6 +144,7 @@ def map_hourly_weather(data: WeatherApiResponse) -> List[WeatherForecastData]:
             hourly_list.append(hour_forecast)
 
         return hourly_list
+
     except KeyError as e:
         logger.error(
             "Missing required field in hourly weather api response", error=str(e)

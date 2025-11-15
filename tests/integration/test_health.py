@@ -1,3 +1,5 @@
+"""Tests for the health check endpoint of the FastAPI application."""
+
 from fastapi.testclient import TestClient
 import pytest
 
@@ -29,11 +31,7 @@ class TestHealthEndpoint:
 
         assert isinstance(data["uptime_seconds"], (int, float))
 
-
-class TestHealthEndpointIntegration:
-    """Integration tests for health endpoint with real dependencies"""
-
-    def test_real_health_check(self):
+    def test_health_check_integration(self):
         """Test health check with real dependencies (may be slow)"""
         with TestClient(app) as client:
             response = client.get("/dev/api/health")

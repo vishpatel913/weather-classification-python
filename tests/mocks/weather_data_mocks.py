@@ -1,3 +1,5 @@
+"""Mock weather data for testing purposes"""
+
 mock_coordinates = {
     "latitude": 51.5,
     "longitude": -0.1278,

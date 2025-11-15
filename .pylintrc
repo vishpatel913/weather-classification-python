@@ -4,3 +4,7 @@ load-plugins=pylint_pydantic
 [TYPECHECK]
 generated-members=pydantic.*, BaseModel.*
 ignored-classes=pydantic.fields.FieldInfo, BaseModel
+
+[tests]
+disable=too-many-arguments,duplicate-code
+max-args=10

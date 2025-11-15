@@ -1,4 +1,4 @@
-# """Integration tests for current weather endpoint"""
+"""Integration tests for hourly weather endpoint"""
 
 import pytest
 from fastapi.testclient import TestClient
@@ -22,13 +22,11 @@ class TestHourlyWeatherEndpoint:
         weather_api_mock,
         sample_coordinates,
         mock_hourly_weather_api_response,
-        mock_daily_weather_api_response,
     ):
         """Test hourly weather when services are healthy"""
         weather_api_mock["forecast"].respond(
             json={
                 **mock_hourly_weather_api_response,
-                **mock_daily_weather_api_response,
             },
             status_code=200,
         )
@@ -86,3 +84,32 @@ class TestHourlyWeatherEndpoint:
         assert first_hour_result["is_day"] == 1
         assert first_hour_result["temperature"]["value"] == 15.9
         assert first_hour_result["temperature"]["unit"] == "°C"
+
+    @pytest.mark.asyncio
+    async def test_weather_hourly_api_failure(
+        self,
+        *,
+        test_client,
+        weather_api_mock,
+        sample_coordinates,
+    ):
+        """Test hourly weather when external API fails"""
+        weather_api_mock["forecast"].respond(
+            json={
+                "error": True,
+                "reason": "something went wrong with hourly but no idea why",
+            },
+            status_code=500,
+        )
+
+        result = test_client.get(
+            (
+                "/dev/api/v1/weather/hourly?"
+                "forecast_length=1&"
+                f"latitude={sample_coordinates['latitude']}&"
+                f"longitude={sample_coordinates['longitude']}"
+            )
+        )
+
+        assert result.status_code == 500
+        assert "service unavailable" in result.json()["detail"].lower()

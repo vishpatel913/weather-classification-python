@@ -1,6 +1,8 @@
-from fastapi import FastAPI
-from fastapi.middleware.cors import CORSMiddleware
+"""Main application entry point for the FastAPI service."""
+
 from contextlib import asynccontextmanager
+from fastapi.middleware.cors import CORSMiddleware
+from fastapi import FastAPI
 from mangum import Mangum
 
 from app.routers.base_router import BaseRouter
@@ -9,7 +11,10 @@ from app.config import settings
 
 
 @asynccontextmanager
-async def lifespan(app: FastAPI):
+async def lifespan(
+    app: FastAPI,  # pylint: disable=redefined-outer-name, unused-argument
+):
+    """Lifespan context manager for startup and shutdown events."""
     # Startup
     print(f"Starting {settings.app_name} v{settings.app_version}")
     # Future: Initialize ML models, database connections, etc.

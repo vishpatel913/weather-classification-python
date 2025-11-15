@@ -1,7 +1,7 @@
 """Weather Router module for handling weather-related API endpoints."""
 
 from typing import Annotated, Optional
-from fastapi import APIRouter, Depends, Query
+from fastapi import APIRouter, Depends, HTTPException, Query, status
 import structlog
 
 from app.schemas.api.weather_response import (
@@ -39,14 +39,22 @@ async def get_current_forecast(
     """Handler for getting current weather conditions"""
     logger.info("Requesting current weather...")
 
-    current = await weather_service.get_current_weather(
-        latitude=query.latitude,
-        longitude=query.longitude,
-    )
-    daily = await weather_service.get_daily_weather(
-        latitude=query.latitude,
-        longitude=query.longitude,
-    )
+    try:
+        current = await weather_service.get_current_weather(
+            latitude=query.latitude,
+            longitude=query.longitude,
+        )
+        daily = await weather_service.get_daily_weather(
+            latitude=query.latitude,
+            longitude=query.longitude,
+        )
+
+    except Exception as e:
+        logger.error("Unexpected error in current weather endpoint", error=str(e))
+        raise HTTPException(
+            status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
+            detail="service unavailable",
+        ) from e
 
     logger.info("Requested current weather")
 
@@ -65,11 +73,20 @@ async def get_hourly_forecast(
 ):
     """Handler for getting hourly weather conditions"""
     logger.info("Requesting hourly weather...")
-    hourly = await weather_service.get_hourly_weather(
-        latitude=query.latitude,
-        longitude=query.longitude,
-        forecast_length=query.forecast_length,
-    )
+
+    try:
+        hourly = await weather_service.get_hourly_weather(
+            latitude=query.latitude,
+            longitude=query.longitude,
+            forecast_length=query.forecast_length,
+        )
+
+    except Exception as e:
+        logger.error("Unexpected error in hourly weather endpoint", error=str(e))
+        raise HTTPException(
+            status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
+            detail="service unavailable",
+        ) from e
 
     logger.info("Requested hourly weather")
 
@@ -88,11 +105,20 @@ async def get_daily_forecast(
 ):
     """Handler for getting daily weather conditions"""
     logger.info("Requesting daily weather...")
-    daily = await weather_service.get_daily_weather(
-        latitude=query.latitude,
-        longitude=query.longitude,
-        forecast_length=query.forecast_length,
-    )
+
+    try:
+        daily = await weather_service.get_daily_weather(
+            latitude=query.latitude,
+            longitude=query.longitude,
+            forecast_length=query.forecast_length,
+        )
+
+    except Exception as e:
+        logger.error("Unexpected error in daily weather endpoint", error=str(e))
+        raise HTTPException(
+            status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
+            detail="service unavailable",
+        ) from e
 
     logger.info("Requested daily weather")
 

@@ -1,3 +1,8 @@
+"""
+Model to represent a value with its unit, and an optional min/max model
+to represent metrics and values.
+"""
+
 from typing import Generic, TypeVar, Optional
 from pydantic import BaseModel, Field
 
