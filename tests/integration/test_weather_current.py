@@ -103,3 +103,29 @@ class TestCurrentWeatherEndpoint:
         assert today_result["temperature"]["min"] == 12.5
         assert today_result["temperature"]["max"] == 20.0
         assert today_result["temperature"]["unit"] == "°C"
+
+    @pytest.mark.asyncio
+    async def test_weather_current_api_failure(
+        self,
+        *,
+        test_client,
+        weather_api_mock,
+        sample_coordinates,
+    ):
+        """Test current weather when external API fails"""
+        weather_api_mock["forecast"].respond(
+            json={
+                "error": True,
+                "reason": "something went wrong with current but no idea why",
+            },
+            status_code=500,
+        )
+
+        result = test_client.get(
+            f"/dev/api/v1/weather/current?"
+            f"latitude={sample_coordinates['latitude']}&"
+            f"longitude={sample_coordinates['longitude']}"
+        )
+
+        assert result.status_code == 500
+        assert "service unavailable" in result.json()["detail"].lower()
