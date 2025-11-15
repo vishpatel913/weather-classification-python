@@ -2,7 +2,6 @@
 
 from typing import Annotated, Optional
 from fastapi import APIRouter, Depends, HTTPException, Query, status
-import httpx
 import structlog
 
 from app.schemas.api.weather_response import (
