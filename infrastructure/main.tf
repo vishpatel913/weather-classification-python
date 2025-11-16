@@ -182,7 +182,7 @@ resource "aws_apigatewayv2_route" "app_root" {
 resource "aws_apigatewayv2_route" "health" {
   api_id    = aws_apigatewayv2_api.app.id
   route_key = "GET /api/health"
-  target    = "integrations/${aws_apigatewayv2_integration.api.id}"
+  target    = "integrations/${aws_apigatewayv2_integration.app.id}"
 
   # No authorization for health checks
   authorization_type = "NONE"
