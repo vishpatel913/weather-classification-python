@@ -31,7 +31,7 @@ provider "aws" {
 # }
 
 # ECR Repository
-resource "aws_ecr_repository" "api" {
+resource "aws_ecr_repository" "app" {
   name                 = var.app_name
   image_tag_mutability = "MUTABLE"
 
@@ -41,8 +41,8 @@ resource "aws_ecr_repository" "api" {
 }
 
 # ECR Lifecycle Policy
-resource "aws_ecr_lifecycle_policy" "api" {
-  repository = aws_ecr_repository.api.name
+resource "aws_ecr_lifecycle_policy" "app" {
+  repository = aws_ecr_repository.app.name
 
   policy = jsonencode({
     rules = [
@@ -86,20 +86,40 @@ resource "aws_iam_role_policy_attachment" "lambda_basic" {
   role       = aws_iam_role.lambda_role.name
 }
 
+resource "aws_iam_role_policy" "lambda_secrets_access" {
+  name = "${var.app_name}-lambda-secrets-policy"
+  role = aws_iam_role.lambda_role.id
+
+  policy = jsonencode({
+    Version = "2012-10-17"
+    Statement = [
+      {
+        Effect = "Allow"
+        Action = [
+          "secretsmanager:GetSecretValue"
+        ]
+        Resource = aws_secretsmanager_secret.jwt_secret.arn
+      }
+    ]
+  })
+}
+
+
 # Lambda function
-resource "aws_lambda_function" "api" {
+resource "aws_lambda_function" "app" {
   function_name = var.app_name
   role          = aws_iam_role.lambda_role.arn
 
   package_type = "Image"
-  image_uri    = "${aws_ecr_repository.api.repository_url}:latest"
+  image_uri    = "${aws_ecr_repository.app.repository_url}:latest"
 
   timeout     = 900  # 15 minutes max
   memory_size = 1024 # Start with 1GB, adjust as needed
 
   environment {
     variables = {
-      ENV = "production"
+      ENV            = "production"
+      JWT_SECRET_ARN = aws_secretsmanager_secret.jwt_secret.arn
     }
   }
 
@@ -116,7 +136,7 @@ resource "aws_cloudwatch_log_group" "lambda_logs" {
 }
 
 # API Gateway v2 (HTTP API - cheaper than REST API)
-resource "aws_apigatewayv2_api" "api" {
+resource "aws_apigatewayv2_api" "app" {
   name          = "${var.app_name}-gateway"
   protocol_type = "HTTP"
   description   = "HTTP API for ${var.app_name}"
@@ -131,31 +151,46 @@ resource "aws_apigatewayv2_api" "api" {
 }
 
 # API Gateway Lambda integration
-resource "aws_apigatewayv2_integration" "api" {
-  api_id             = aws_apigatewayv2_api.api.id
+resource "aws_apigatewayv2_integration" "app" {
+  api_id             = aws_apigatewayv2_api.app.id
   integration_type   = "AWS_PROXY"
   integration_method = "POST"
-  integration_uri    = aws_lambda_function.api.invoke_arn
+  integration_uri    = aws_lambda_function.app.invoke_arn
 }
 
 # API Gateway route
-resource "aws_apigatewayv2_route" "api" {
-  api_id    = aws_apigatewayv2_api.api.id
+resource "aws_apigatewayv2_route" "app" {
+  api_id    = aws_apigatewayv2_api.app.id
   route_key = "ANY /{proxy+}"
-  target    = "integrations/${aws_apigatewayv2_integration.api.id}"
+  target    = "integrations/${aws_apigatewayv2_integration.app.id}"
+
+  authorization_type = "JWT"
+  authorizer_id      = aws_apigatewayv2_authorizer.jwt.id
+
 }
 
 # API Gateway default route (for root path)
 resource "aws_apigatewayv2_route" "app_root" {
-  api_id    = aws_apigatewayv2_api.api.id
+  api_id    = aws_apigatewayv2_api.app.id
   route_key = "ANY /"
-  target    = "integrations/${aws_apigatewayv2_integration.api.id}"
+  target    = "integrations/${aws_apigatewayv2_integration.app.id}"
+
+  authorization_type = "JWT"
+  authorizer_id      = aws_apigatewayv2_authorizer.jwt.id
 }
 
+resource "aws_apigatewayv2_route" "health" {
+  api_id    = aws_apigatewayv2_api.app.id
+  route_key = "GET /api/health"
+  target    = "integrations/${aws_apigatewayv2_integration.api.id}"
+
+  # No authorization for health checks
+  authorization_type = "NONE"
+}
 
 # API Gateway deployment
-resource "aws_apigatewayv2_stage" "api" {
-  api_id      = aws_apigatewayv2_api.api.id
+resource "aws_apigatewayv2_stage" "app" {
+  api_id      = aws_apigatewayv2_api.app.id
   name        = var.environment
   auto_deploy = true
 
@@ -174,6 +209,21 @@ resource "aws_apigatewayv2_stage" "api" {
   }
 }
 
+
+# API Gateway JWT Authorizer
+resource "aws_apigatewayv2_authorizer" "jwt" {
+  api_id           = aws_apigatewayv2_api.app.id
+  authorizer_type  = "JWT"
+  identity_sources = ["$request.header.Authorization"]
+  name             = "${var.app_name}-jwt-authorizer"
+
+  jwt_configuration {
+    audience = [var.app_name]
+    issuer   = "https://${var.app_name}.execute-api.${var.aws_region}.amazonaws.com"
+  }
+}
+
+
 # CloudWatch Log Group for API Gateway
 resource "aws_cloudwatch_log_group" "api_gateway_logs" {
   name              = "/aws/apigateway/${var.app_name}"
@@ -184,7 +234,41 @@ resource "aws_cloudwatch_log_group" "api_gateway_logs" {
 resource "aws_lambda_permission" "api_gateway" {
   statement_id  = "AllowExecutionFromAPIGateway"
   action        = "lambda:InvokeFunction"
-  function_name = aws_lambda_function.api.function_name
+  function_name = aws_lambda_function.app.function_name
   principal     = "apigateway.amazonaws.com"
-  source_arn    = "${aws_apigatewayv2_api.api.execution_arn}/*/*"
+  source_arn    = "${aws_apigatewayv2_api.app.execution_arn}/*/*"
+}
+
+# SSM Parameter for JWT secret
+resource "aws_ssm_parameter" "jwt_secret" {
+  name        = "/${var.app_name}/jwt-secret"
+  description = "JWT signing secret"
+  type        = "SecureString" # Encrypted at rest
+  value       = random_password.jwt_secret.result
+
+  tags = {
+    Environment = var.environment
+  }
+}
+
+
+# Secrets Manager secret for JWT
+resource "random_password" "jwt_secret" {
+  length  = 64
+  special = true
+}
+
+resource "aws_secretsmanager_secret" "jwt_secret" {
+  name                    = "${var.app_name}-jwt-secret"
+  description             = "JWT signing secret for API authentication"
+  recovery_window_in_days = 7
+}
+
+resource "aws_secretsmanager_secret_version" "jwt_secret" {
+  secret_id = aws_secretsmanager_secret.jwt_secret.id
+  secret_string = jsonencode({
+    secret   = random_password.jwt_secret.result
+    issuer   = "https://${var.app_name}.execute-api.${var.aws_region}.amazonaws.com"
+    audience = var.app_name
+  })
 }
