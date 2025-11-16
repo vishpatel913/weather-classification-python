@@ -49,6 +49,9 @@ jobs:
       id: tf-output
       working-directory: ./infrastructure
       run: |
-        terraform output -raw ecr_repository_url >> $GITHUB_OUTPUT
-        terraform output -raw lambda_function_name >> $GITHUB_OUTPUT
-        terraform output -raw api_gateway_url >> $GITHUB_OUTPUT
+        terraform output -raw ecr_repository_url
+        terraform output -raw lambda_function_name
+        terraform output -raw api_gateway_url
+        terraform output cognito_user_pool_id
+        terraform output cognito_client_id
+        terraform output cognito_issuer

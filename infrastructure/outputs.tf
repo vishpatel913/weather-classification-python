@@ -19,13 +19,26 @@ output "jwt_secret_arn" {
 }
 
 output "cognito_user_pool_id" {
-  value = aws_cognito_user_pool.main.id
+  description = "Cognito User Pool ID"
+  value       = aws_cognito_user_pool.main.id
+}
+
+output "cognito_user_pool_arn" {
+  description = "Cognito User Pool ARN"
+  value       = aws_cognito_user_pool.main.arn
 }
 
 output "cognito_client_id" {
-  value = aws_cognito_user_pool_client.main.id
+  description = "Cognito App Client ID"
+  value       = aws_cognito_user_pool_client.main.id
 }
 
 output "cognito_issuer" {
-  value = "https://cognito-idp.${var.aws_region}.amazonaws.com/${aws_cognito_user_pool.main.id}"
+  description = "Cognito Issuer URL (for JWT validation)"
+  value       = "https://cognito-idp.${var.aws_region}.amazonaws.com/${aws_cognito_user_pool.main.id}"
+}
+
+output "cognito_user_pool_endpoint" {
+  description = "Cognito User Pool Endpoint"
+  value       = aws_cognito_user_pool.main.endpoint
 }

@@ -281,7 +281,7 @@ resource "aws_cognito_user_pool" "main" {
   username_attributes      = ["email"]
   auto_verified_attributes = ["email"]
 
-  # Password policy (make it easy for yourself)
+  # Password policy
   password_policy {
     minimum_length    = 8
     require_lowercase = false
@@ -297,6 +297,20 @@ resource "aws_cognito_user_pool" "main" {
       priority = 1
     }
   }
+
+  email_configuration {
+    email_sending_account = "COGNITO_DEFAULT"
+  }
+
+  lifecycle {
+    prevent_destroy = false # Set to true in production
+  }
+
+  tags = {
+    Name        = "${var.app_name}-user-pool"
+    Environment = var.environment
+  }
+
 }
 
 resource "aws_cognito_user_pool_client" "main" {
@@ -314,11 +328,35 @@ resource "aws_cognito_user_pool_client" "main" {
   }
 
   explicit_auth_flows = [
-    "ALLOW_USER_PASSWORD_AUTH",
-    "ALLOW_REFRESH_TOKEN_AUTH",
-    "ALLOW_USER_SRP_AUTH"
+    "ALLOW_USER_PASSWORD_AUTH",      # Username/password auth
+    "ALLOW_REFRESH_TOKEN_AUTH",      # Token refresh
+    "ALLOW_USER_SRP_AUTH",           # Secure Remote Password
+    "ALLOW_ADMIN_USER_PASSWORD_AUTH" # Admin auth (for scripts)
   ]
 
-  # Prevent secret (simpler for CLI usage)
+  # Prevent secret
   generate_secret = false
+
+  prevent_user_existence_errors = "ENABLED"
+
+  enable_token_revocation = true
+
+  read_attributes = [
+    "email",
+    "email_verified"
+  ]
+
+  write_attributes = [
+    "email"
+  ]
+}
+
+resource "aws_cognito_user" "admin" {
+  user_pool_id = aws_cognito_user_pool.main.id
+  username     = "ci@vishpatel.com"
+
+  attributes = {
+    email          = "ci@vishpatel.com"
+    email_verified = true
+  }
 }
