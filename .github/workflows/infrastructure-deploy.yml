@@ -49,9 +49,6 @@ jobs:
       id: tf-output
       working-directory: ./infrastructure
       run: |
-        echo "ecr-repository<<EOF" >> $GITHUB_OUTPUT
         terraform output -raw ecr_repository_url >> $GITHUB_OUTPUT
-        echo "EOF" >> $GITHUB_OUTPUT
-        echo "lambda-function-name<<EOF" >> $GITHUB_OUTPUT
         terraform output -raw lambda_function_name >> $GITHUB_OUTPUT
-        echo "EOF" >> $GITHUB_OUTPUT
+        terraform output -raw api_gateway_url >> $GITHUB_OUTPUT
