@@ -218,8 +218,8 @@ resource "aws_apigatewayv2_authorizer" "jwt" {
   name             = "${var.app_name}-jwt-authorizer"
 
   jwt_configuration {
-    audience = [var.app_name]
-    issuer   = "https://${var.app_name}.execute-api.${var.aws_region}.amazonaws.com"
+    audience = [aws_cognito_user_pool_client.main.id]
+    issuer   = "https://cognito-idp.${var.aws_region}.amazonaws.com/${aws_cognito_user_pool.main.id}"
   }
 }
 
@@ -271,4 +271,54 @@ resource "aws_secretsmanager_secret_version" "jwt_secret" {
     issuer   = "https://${var.app_name}.execute-api.${var.aws_region}.amazonaws.com"
     audience = var.app_name
   })
+}
+
+# AWS Cognito User Pool
+resource "aws_cognito_user_pool" "main" {
+  name = "${var.app_name}-users"
+
+  # Allow users to sign in with username
+  username_attributes      = ["email"]
+  auto_verified_attributes = ["email"]
+
+  # Password policy (make it easy for yourself)
+  password_policy {
+    minimum_length    = 8
+    require_lowercase = false
+    require_numbers   = false
+    require_symbols   = false
+    require_uppercase = false
+  }
+
+  # Account recovery
+  account_recovery_setting {
+    recovery_mechanism {
+      name     = "verified_email"
+      priority = 1
+    }
+  }
+}
+
+resource "aws_cognito_user_pool_client" "main" {
+  name         = "${var.app_name}-client"
+  user_pool_id = aws_cognito_user_pool.main.id
+
+  access_token_validity  = 60
+  id_token_validity      = 60
+  refresh_token_validity = 30
+
+  token_validity_units {
+    access_token  = "minutes"
+    id_token      = "minutes"
+    refresh_token = "days"
+  }
+
+  explicit_auth_flows = [
+    "ALLOW_USER_PASSWORD_AUTH",
+    "ALLOW_REFRESH_TOKEN_AUTH",
+    "ALLOW_USER_SRP_AUTH"
+  ]
+
+  # Prevent secret (simpler for CLI usage)
+  generate_secret = false
 }
