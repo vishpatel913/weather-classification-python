@@ -31,7 +31,7 @@ provider "aws" {
 # }
 
 # ECR Repository
-resource "aws_ecr_repository" "app" {
+resource "aws_ecr_repository" "api" {
   name                 = var.app_name
   image_tag_mutability = "MUTABLE"
 
@@ -41,8 +41,8 @@ resource "aws_ecr_repository" "app" {
 }
 
 # ECR Lifecycle Policy
-resource "aws_ecr_lifecycle_policy" "app" {
-  repository = aws_ecr_repository.app.name
+resource "aws_ecr_lifecycle_policy" "api" {
+  repository = aws_ecr_repository.api.name
 
   policy = jsonencode({
     rules = [
@@ -106,12 +106,12 @@ resource "aws_iam_role_policy" "lambda_secrets_access" {
 
 
 # Lambda function
-resource "aws_lambda_function" "app" {
+resource "aws_lambda_function" "api" {
   function_name = var.app_name
   role          = aws_iam_role.lambda_role.arn
 
   package_type = "Image"
-  image_uri    = "${aws_ecr_repository.app.repository_url}:latest"
+  image_uri    = "${aws_ecr_repository.api.repository_url}:latest"
 
   timeout     = 900  # 15 minutes max
   memory_size = 1024 # Start with 1GB, adjust as needed
@@ -136,7 +136,7 @@ resource "aws_cloudwatch_log_group" "lambda_logs" {
 }
 
 # API Gateway v2 (HTTP API - cheaper than REST API)
-resource "aws_apigatewayv2_api" "app" {
+resource "aws_apigatewayv2_api" "api" {
   name          = "${var.app_name}-gateway"
   protocol_type = "HTTP"
   description   = "HTTP API for ${var.app_name}"
@@ -151,18 +151,18 @@ resource "aws_apigatewayv2_api" "app" {
 }
 
 # API Gateway Lambda integration
-resource "aws_apigatewayv2_integration" "app" {
-  api_id             = aws_apigatewayv2_api.app.id
+resource "aws_apigatewayv2_integration" "api" {
+  api_id             = aws_apigatewayv2_api.api.id
   integration_type   = "AWS_PROXY"
   integration_method = "POST"
-  integration_uri    = aws_lambda_function.app.invoke_arn
+  integration_uri    = aws_lambda_function.api.invoke_arn
 }
 
 # API Gateway route
-resource "aws_apigatewayv2_route" "app" {
-  api_id    = aws_apigatewayv2_api.app.id
+resource "aws_apigatewayv2_route" "api" {
+  api_id    = aws_apigatewayv2_api.api.id
   route_key = "ANY /{proxy+}"
-  target    = "integrations/${aws_apigatewayv2_integration.app.id}"
+  target    = "integrations/${aws_apigatewayv2_integration.api.id}"
 
   authorization_type = "JWT"
   authorizer_id      = aws_apigatewayv2_authorizer.jwt.id
@@ -171,26 +171,26 @@ resource "aws_apigatewayv2_route" "app" {
 
 # API Gateway default route (for root path)
 resource "aws_apigatewayv2_route" "app_root" {
-  api_id    = aws_apigatewayv2_api.app.id
+  api_id    = aws_apigatewayv2_api.api.id
   route_key = "ANY /"
-  target    = "integrations/${aws_apigatewayv2_integration.app.id}"
+  target    = "integrations/${aws_apigatewayv2_integration.api.id}"
 
   authorization_type = "JWT"
   authorizer_id      = aws_apigatewayv2_authorizer.jwt.id
 }
 
 resource "aws_apigatewayv2_route" "health" {
-  api_id    = aws_apigatewayv2_api.app.id
+  api_id    = aws_apigatewayv2_api.api.id
   route_key = "GET /api/health"
-  target    = "integrations/${aws_apigatewayv2_integration.app.id}"
+  target    = "integrations/${aws_apigatewayv2_integration.api.id}"
 
   # No authorization for health checks
   authorization_type = "NONE"
 }
 
 # API Gateway deployment
-resource "aws_apigatewayv2_stage" "app" {
-  api_id      = aws_apigatewayv2_api.app.id
+resource "aws_apigatewayv2_stage" "api" {
+  api_id      = aws_apigatewayv2_api.api.id
   name        = var.environment
   auto_deploy = true
 
@@ -212,7 +212,7 @@ resource "aws_apigatewayv2_stage" "app" {
 
 # API Gateway JWT Authorizer
 resource "aws_apigatewayv2_authorizer" "jwt" {
-  api_id           = aws_apigatewayv2_api.app.id
+  api_id           = aws_apigatewayv2_api.api.id
   authorizer_type  = "JWT"
   identity_sources = ["$request.header.Authorization"]
   name             = "${var.app_name}-jwt-authorizer"
@@ -234,9 +234,9 @@ resource "aws_cloudwatch_log_group" "api_gateway_logs" {
 resource "aws_lambda_permission" "api_gateway" {
   statement_id  = "AllowExecutionFromAPIGateway"
   action        = "lambda:InvokeFunction"
-  function_name = aws_lambda_function.app.function_name
+  function_name = aws_lambda_function.api.function_name
   principal     = "apigateway.amazonaws.com"
-  source_arn    = "${aws_apigatewayv2_api.app.execution_arn}/*/*"
+  source_arn    = "${aws_apigatewayv2_api.api.execution_arn}/*/*"
 }
 
 # SSM Parameter for JWT secret
